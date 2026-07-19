@@ -1,0 +1,20 @@
+{
+    "task": [
+        {
+            "name": "征服模式刷币",
+            "entry": "征服模式刷币(阿加莎模式)",
+            "resource": [
+                "官服"
+            ],
+            "description": "仅在官服使用"
+        },
+        {
+            "name": "战斗选牌",
+            "entry": "开始战斗",
+            "resource": [
+                "官服"
+            ],
+            "description": "仅在官服使用"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "开始战斗": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "chose_cards_reco"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "max_hit": 1
+    }
+}

@@ -5,7 +5,7 @@ from maa.toolkit import Toolkit
 
 import my_action
 import my_reco
-
+import chose_cards_reco
 
 def main():
     Toolkit.init_option("./")
@@ -16,7 +16,7 @@ def main():
         sys.exit(1)
         
     socket_id = sys.argv[-1]
-
+    # print(f"Custom Recognitions: {AgentServer.custom_recognition_list}")
     AgentServer.start_up(socket_id)
     AgentServer.join()
     AgentServer.shut_down()
