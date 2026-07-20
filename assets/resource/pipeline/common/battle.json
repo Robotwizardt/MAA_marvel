@@ -1,0 +1,299 @@
+{
+    "公共-比赛开始": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "match_started"
+                }
+            }
+        },
+        "next": [
+            "公共-等待战斗状态"
+        ]
+    },
+    "公共-等待战斗状态": {
+        "next": [
+            "公共-首回合",
+            "公共-匹配中",
+            "征服-轮间结果",
+            "征服-整场结果",
+            "公共-重新连接"
+        ],
+        "rate_limit": 1500,
+        "timeout": 600000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-匹配中": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    120,
+                    420,
+                    480,
+                    440
+                ],
+                "expected": [
+                    "正在匹配",
+                    "寻找对手"
+                ]
+            }
+        },
+        "post_delay": 1500,
+        "next": [
+            "公共-等待战斗状态"
+        ]
+    },
+    "公共-首回合": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    470,
+                    880,
+                    250,
+                    300
+                ],
+                "expected": [
+                    "结束回合"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "turn_started",
+                    "value": 1
+                }
+            }
+        },
+        "next": [
+            "公共-撤退判断"
+        ]
+    },
+    "公共-停止判断": {
+        "next": [
+            "公共-停止命中",
+            "公共-停止跳过"
+        ]
+    },
+    "公共-停止命中": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "should_stop"
+                }
+            }
+        },
+        "next": [
+            "公共-安全停止"
+        ]
+    },
+    "公共-停止跳过": {
+        "next": [
+            "公共-执行出牌"
+        ]
+    },
+    "公共-执行出牌": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelPlayTurn",
+                "custom_action_param": {}
+            }
+        },
+        "next": [
+            "公共-SNAP判断"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-SNAP判断": {
+        "next": [
+            "公共-SNAP命中",
+            "公共-SNAP跳过"
+        ]
+    },
+    "公共-SNAP命中": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "should_snap"
+                }
+            }
+        },
+        "next": [
+            "公共-点击SNAP",
+            "公共-结束回合"
+        ]
+    },
+    "公共-SNAP跳过": {
+        "next": [
+            "公共-结束回合"
+        ]
+    },
+    "公共-点击SNAP": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    720,
+                    500
+                ],
+                "expected": [
+                    "SNAP"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "公共-结束回合"
+        ]
+    },
+    "公共-结束回合": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    470,
+                    880,
+                    250,
+                    300
+                ],
+                "expected": [
+                    "结束回合"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 800,
+        "next": [
+            "公共-等待新状态"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-等待新状态": {
+        "next": [
+            "公共-新回合",
+            "征服-轮间结果",
+            "征服-整场结果",
+            "公共-重新连接",
+            "公共-等待对手"
+        ],
+        "rate_limit": 1500,
+        "timeout": 180000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-等待对手": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    420,
+                    840,
+                    300,
+                    360
+                ],
+                "expected": [
+                    "等待对手",
+                    "对手回合",
+                    "已结束回合"
+                ]
+            }
+        },
+        "post_delay": 1500,
+        "next": [
+            "公共-等待新状态"
+        ]
+    },
+    "公共-新回合": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    470,
+                    880,
+                    250,
+                    300
+                ],
+                "expected": [
+                    "结束回合"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "turn_started"
+                }
+            }
+        },
+        "next": [
+            "公共-撤退判断"
+        ]
+    },
+    "公共-重新连接": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    100,
+                    350,
+                    520,
+                    500
+                ],
+                "expected": [
+                    "重新连接",
+                    "重连"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "公共-等待新状态"
+        ]
+    },
+    "公共-零能量": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    290,
+                    1120,
+                    140,
+                    160
+                ],
+                "expected": [
+                    "^0$"
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,151 @@
+{
+    "公共-撤退判断": {
+        "next": [
+            "公共-撤退命中",
+            "公共-撤退跳过"
+        ]
+    },
+    "公共-撤退命中": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "should_retreat"
+                }
+            }
+        },
+        "next": [
+            "公共-点击撤退"
+        ]
+    },
+    "公共-撤退跳过": {
+        "next": [
+            "公共-停止判断"
+        ]
+    },
+    "公共-点击撤退": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    280,
+                    300
+                ],
+                "expected": [
+                    "撤退"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "公共-确认撤退"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-确认撤退": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    100,
+                    350,
+                    520,
+                    500
+                ],
+                "expected": [
+                    "撤退"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "公共-撤退后判断"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-撤退后判断": {
+        "next": [
+            "公共-整场认输命中",
+            "征服-轮间继续"
+        ]
+    },
+    "公共-整场认输命中": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "after_retreat_concede"
+                }
+            }
+        },
+        "next": [
+            "公共-点击整场认输"
+        ]
+    },
+    "公共-点击整场认输": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    80,
+                    500,
+                    560,
+                    500
+                ],
+                "expected": [
+                    "认输"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "公共-确认整场认输"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-确认整场认输": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    100,
+                    350,
+                    520,
+                    500
+                ],
+                "expected": [
+                    "认输"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "征服-整场结果"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    }
+}

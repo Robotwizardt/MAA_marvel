@@ -1,0 +1,170 @@
+{
+    "征服-轮间结果": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    80,
+                    700,
+                    560,
+                    500
+                ],
+                "expected": [
+                    "下一轮",
+                    "继续"
+                ]
+            }
+        },
+        "next": [
+            "征服-轮间继续"
+        ]
+    },
+    "征服-轮间继续": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    80,
+                    700,
+                    560,
+                    500
+                ],
+                "expected": [
+                    "下一轮",
+                    "继续"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": [
+            "公共-等待新状态"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-整场结果": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    720,
+                    1280
+                ],
+                "expected": [
+                    "征服完成",
+                    "胜利",
+                    "失败"
+                ]
+            }
+        },
+        "next": [
+            "征服-结果继续"
+        ]
+    },
+    "征服-结果继续": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    80,
+                    650,
+                    560,
+                    570
+                ],
+                "expected": [
+                    "继续",
+                    "下一步",
+                    "领取"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "征服-结果后状态"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-结果后状态": {
+        "next": [
+            "征服-结果继续",
+            "征服-返回征服大厅"
+        ],
+        "rate_limit": 1000,
+        "timeout": 60000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-返回征服大厅": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    150,
+                    90,
+                    420,
+                    190
+                ],
+                "expected": [
+                    "试炼之地",
+                    "白银征服模式",
+                    "黄金征服模式",
+                    "无限征服模式"
+                ]
+            }
+        },
+        "next": [
+            "征服-记录整场完成"
+        ]
+    },
+    "征服-记录整场完成": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "match_completed"
+                }
+            }
+        },
+        "next": [
+            "征服-结束后停止判断"
+        ]
+    },
+    "征服-结束后停止判断": {
+        "next": [
+            "征服-结束后停止命中",
+            "征服-结束后继续"
+        ]
+    },
+    "征服-结束后停止命中": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "should_stop"
+                }
+            }
+        },
+        "next": [
+            "公共-安全停止"
+        ]
+    },
+    "征服-结束后继续": {
+        "next": [
+            "征服-选择档位候选"
+        ]
+    }
+}
