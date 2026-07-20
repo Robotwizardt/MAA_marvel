@@ -1,0 +1,528 @@
+{
+    "task": [
+        {
+            "name": "征服模式自动对战",
+            "entry": "征服-任务入口",
+            "resource": [
+                "官服"
+            ],
+            "controller": [
+                "安卓端"
+            ],
+            "description": "仅支持国服安卓端 720×1280；不会购买门票或消耗金块。",
+            "option": [
+                "征服-出牌策略",
+                "征服-最高档位",
+                "征服-无票行为",
+                "征服-自动撤退",
+                "征服-撤退后",
+                "征服-SNAP",
+                "征服-最大对局数",
+                "征服-最大运行分钟",
+                "征服-匹配超时",
+                "征服-自动重启"
+            ]
+        }
+    ],
+    "option": {
+        "征服-出牌策略": {
+            "type": "select",
+            "label": "出牌策略",
+            "default_case": "random",
+            "cases": [
+                {
+                    "name": "random",
+                    "label": "随机出牌",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "play_strategy": "random"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "agatha",
+                    "label": "阿加莎托管",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "play_strategy": "agatha"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "ocr",
+                    "label": "OCR 选牌（实验）",
+                    "description": "识别失败时直接结束回合，不会自动回退随机策略。",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "play_strategy": "ocr"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "征服-最高档位": {
+            "type": "select",
+            "label": "最高征服档位",
+            "description": "从该档位向下寻找已有门票；绝不使用金块购买入口。",
+            "default_case": "proving_grounds",
+            "cases": [
+                {
+                    "name": "proving_grounds",
+                    "label": "试炼之地",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "max_tier": "proving_grounds"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "silver",
+                    "label": "白银征服",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "max_tier": "silver"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "gold",
+                    "label": "黄金征服",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "max_tier": "gold"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "infinite",
+                    "label": "无限征服",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "max_tier": "infinite"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "征服-无票行为": {
+            "type": "select",
+            "label": "无票行为",
+            "default_case": "fallback",
+            "cases": [
+                {
+                    "name": "fallback",
+                    "label": "回退试炼之地",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "no_ticket": "fallback"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "stop",
+                    "label": "停止任务",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "no_ticket": "stop"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "征服-自动撤退": {
+            "type": "select",
+            "label": "自动撤退",
+            "description": "选择完成第 N 回合后撤退时，会在第 N+1 回合开始执行。",
+            "default_case": "off",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "retreat_after_turn": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "turn_1",
+                    "label": "完成第 1 回合后",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "retreat_after_turn": 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "turn_2",
+                    "label": "完成第 2 回合后",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "retreat_after_turn": 2
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "turn_3",
+                    "label": "完成第 3 回合后",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "retreat_after_turn": 3
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "turn_4",
+                    "label": "完成第 4 回合后",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "retreat_after_turn": 4
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "turn_5",
+                    "label": "完成第 5 回合后",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "retreat_after_turn": 5
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "turn_6",
+                    "label": "完成第 6 回合后",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "retreat_after_turn": 6
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "征服-撤退后": {
+            "type": "select",
+            "label": "撤退后",
+            "default_case": "continue",
+            "cases": [
+                {
+                    "name": "continue",
+                    "label": "继续下一轮",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "after_retreat": "continue"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "concede",
+                    "label": "认输整场",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "after_retreat": "concede"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "征服-SNAP": {
+            "type": "select",
+            "label": "SNAP",
+            "default_case": "off",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "snap_mode": "off"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "probability",
+                    "label": "固定概率",
+                    "option": [
+                        "征服-SNAP概率"
+                    ],
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "snap_mode": "probability"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "always",
+                    "label": "每局必定执行",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "snap_mode": "always"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "征服-SNAP概率": {
+            "type": "input",
+            "label": "SNAP 概率",
+            "inputs": [
+                {
+                    "name": "SNAP概率",
+                    "label": "0–100",
+                    "default": "46",
+                    "pipeline_type": "int",
+                    "verify": "^(100|[1-9]?[0-9])$",
+                    "pattern_msg": "请输入 0 到 100 的整数"
+                }
+            ],
+            "pipeline_override": {
+                "征服-初始化会话": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "snap_probability": "{SNAP概率}"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "征服-最大对局数": {
+            "type": "input",
+            "label": "最大对局数",
+            "description": "0 表示不限制。",
+            "inputs": [
+                {
+                    "name": "最大对局数",
+                    "default": "0",
+                    "pipeline_type": "int",
+                    "verify": "^(0|[1-9][0-9]*)$",
+                    "pattern_msg": "请输入非负整数"
+                }
+            ],
+            "pipeline_override": {
+                "征服-初始化会话": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "max_matches": "{最大对局数}"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "征服-最大运行分钟": {
+            "type": "input",
+            "label": "最大运行分钟数",
+            "description": "0 表示不限制。",
+            "inputs": [
+                {
+                    "name": "最大运行分钟",
+                    "default": "0",
+                    "pipeline_type": "int",
+                    "verify": "^(0|[1-9][0-9]*)$",
+                    "pattern_msg": "请输入非负整数"
+                }
+            ],
+            "pipeline_override": {
+                "征服-初始化会话": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "max_minutes": "{最大运行分钟}"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "征服-匹配超时": {
+            "type": "input",
+            "label": "匹配超时（秒）",
+            "inputs": [
+                {
+                    "name": "匹配超时",
+                    "default": "600",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]*$",
+                    "pattern_msg": "请输入正整数秒数"
+                }
+            ],
+            "pipeline_override": {
+                "征服-初始化会话": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "matchmaking_timeout_seconds": "{匹配超时}"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "征服-自动重启": {
+            "type": "switch",
+            "label": "异常时自动重启游戏",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "auto_restart": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "auto_restart": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
