@@ -28,7 +28,8 @@ class SafeEntry(CustomRecognition):
             tier = ConquestTier(tier_value)
 
         def matched(entry: str) -> bool:
-            return context.run_recognition(entry, argv.image) is not None
+            result = context.run_recognition(entry, argv.image)
+            return result is not None and result.box is not None
 
         evidence = EntryEvidence(
             tier=tier,

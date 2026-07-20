@@ -2,6 +2,8 @@ from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
+from PIL import Image
+
 from agent.recognitions.safe_entry import SafeEntry
 from tools.validate_schema import load_jsonc
 
@@ -33,8 +35,9 @@ class FakeRecognitionContext:
         entry: str,
         image: object,
         pipeline_override: object = None,
-    ) -> object | None:
-        return object() if entry in self.matches else None
+    ) -> object:
+        box = (1, 1, 10, 10) if entry in self.matches else None
+        return SimpleNamespace(box=box)
 
 
 class ConquestPipelineTests(unittest.TestCase):
@@ -57,6 +60,8 @@ class ConquestPipelineTests(unittest.TestCase):
             "征服-点击免费进入",
             "征服-点击门票进入",
             "征服-点击开战",
+            "征服-确认卡组页面",
+            "征服-确认使用卡组",
         }
         self.assertTrue(required.issubset(self.nodes), required - set(self.nodes))
 
@@ -85,14 +90,40 @@ class ConquestPipelineTests(unittest.TestCase):
             self.assertEqual(next_names(self.nodes[name]), ["征服-拒绝当前档位"])
             self.assertNotEqual(self.nodes[name].get("action"), "Click")
 
-    def test_battle_click_uses_only_battle_template(self) -> None:
+    def test_battle_click_uses_exact_ocr_inside_center_safe_area(self) -> None:
         node = self.nodes["征服-点击开战"]
-        self.assertEqual(node["recognition"]["type"], "TemplateMatch")
-        self.assertEqual(
-            node["recognition"]["param"]["template"],
-            "conquest/prematch/battle.png",
-        )
+        self.assertEqual(node["recognition"]["type"], "OCR")
+        self.assertEqual(node["recognition"]["param"]["expected"], ["^开战$"])
         self.assertEqual(node["action"]["type"], "Click")
+        self.assertNotIn("target", node["action"].get("param", {}))
+
+        x, y, width, height = node["recognition"]["param"]["roi"]
+        self.assertGreaterEqual(x, 250)
+        self.assertLessEqual(x + width, 480)
+        self.assertGreaterEqual(y, 950)
+        self.assertLessEqual(y + height, 1100)
+
+    def test_battle_click_requires_deck_confirmation_before_match_start(self) -> None:
+        self.assertEqual(
+            next_names(self.nodes["征服-点击开战"]),
+            ["征服-确认卡组页面"],
+        )
+        page = self.nodes["征服-确认卡组页面"]
+        self.assertEqual(page["recognition"]["type"], "OCR")
+        self.assertIn("确认卡组", page["recognition"]["param"]["expected"])
+        self.assertEqual(next_names(page), ["征服-确认使用卡组"])
+
+        confirm = self.nodes["征服-确认使用卡组"]
+        self.assertEqual(confirm["recognition"]["type"], "OCR")
+        self.assertIn("^确认$", confirm["recognition"]["param"]["expected"])
+        self.assertEqual(confirm["action"]["type"], "Click")
+        self.assertNotIn("target", confirm["action"].get("param", {}))
+        self.assertEqual(next_names(confirm), ["公共-比赛开始"])
+
+    def test_deck_confirmation_fixture_matches_reference_resolution(self) -> None:
+        path = ROOT / "tests" / "fixtures" / "screens" / "conquest" / "deck_confirmation.png"
+        with Image.open(path) as image:
+            self.assertEqual(image.size, (720, 1280))
 
     def test_session_initialization_contains_all_default_fields(self) -> None:
         values = self.nodes["征服-初始化会话"]["action"]["param"][

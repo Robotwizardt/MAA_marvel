@@ -1,16 +1,17 @@
 {
     "征服-赛前页面": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "conquest/prematch/battle.png",
                 "roi": [
-                    170,
-                    920,
-                    380,
-                    210
+                    250,
+                    950,
+                    230,
+                    150
                 ],
-                "threshold": 0.78
+                "expected": [
+                    "^开战$"
+                ]
             }
         },
         "next": [
@@ -19,16 +20,65 @@
     },
     "征服-点击开战": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "conquest/prematch/battle.png",
                 "roi": [
-                    170,
-                    920,
-                    380,
-                    210
+                    250,
+                    950,
+                    230,
+                    150
                 ],
-                "threshold": 0.78
+                "expected": [
+                    "^开战$"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "征服-确认卡组页面"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-确认卡组页面": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    150,
+                    320,
+                    420,
+                    180
+                ],
+                "expected": [
+                    "确认卡组"
+                ]
+            }
+        },
+        "next": [
+            "征服-确认使用卡组"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-确认使用卡组": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    340,
+                    780,
+                    270,
+                    160
+                ],
+                "expected": [
+                    "^确认$"
+                ]
             }
         },
         "action": {

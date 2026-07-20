@@ -66,7 +66,7 @@
         {
             "source": "tests/fixtures/screens/conquest/prematch_clean.png",
             "output": "assets/resource/image/conquest/prematch/battle.png",
-            "box": [200, 965, 320, 130],
+            "box": [260, 970, 200, 110],
             "positive_nodes": ["征服-点击开战"],
             "negative_sources": ["tests/fixtures/screens/conquest/tier_proving_grounds.png"]
         },
