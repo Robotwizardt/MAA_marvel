@@ -1,0 +1,11 @@
+{
+    "公共-OCR选牌": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelCardSelection",
+                "custom_recognition_param": {}
+            }
+        }
+    }
+}
