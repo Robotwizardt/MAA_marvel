@@ -12,139 +12,126 @@ except ModuleNotFoundError as e:
         "Or add it to your project's requirements."
     ) from e
 
-from configure import configure_ocr_model
+try:
+    from tools.configure import configure_ocr_model
+except ModuleNotFoundError:
+    from configure import configure_ocr_model
 
 
-working_dir = Path(__file__).parent.parent.resolve()
-install_path = working_dir / Path("install")
-version = len(sys.argv) > 1 and sys.argv[1] or "v0.0.1"
-
-# the first parameter is self name
-if sys.argv.__len__() < 4:
-    print("Usage: python install.py <version> <os> <arch>")
-    print("Example: python install.py v1.0.0 win x86_64")
-    sys.exit(1)
-
-os_name = sys.argv[2]
-arch = sys.argv[3]
-
-
-def get_dotnet_platform_tag():
-    """自动检测当前平台并返回对应的dotnet平台标签"""
-    if os_name == "win" and arch == "x86_64":
-        platform_tag = "win-x64"
-    elif os_name == "win" and arch == "aarch64":
-        platform_tag = "win-arm64"
-    elif os_name == "macos" and arch == "x86_64":
-        platform_tag = "osx-x64"
-    elif os_name == "macos" and arch == "aarch64":
-        platform_tag = "osx-arm64"
-    elif os_name == "linux" and arch == "x86_64":
-        platform_tag = "linux-x64"
-    elif os_name == "linux" and arch == "aarch64":
-        platform_tag = "linux-arm64"
-    else:
-        print("Unsupported OS or architecture.")
-        print("available parameters:")
-        print("version: e.g., v1.0.0")
-        print("os: [win, macos, linux, android]")
-        print("arch: [aarch64, x86_64]")
-        sys.exit(1)
-
-    return platform_tag
+def get_dotnet_platform_tag(os_name: str, arch: str) -> str:
+    platforms = {
+        ("win", "x86_64"): "win-x64",
+        ("win", "aarch64"): "win-arm64",
+        ("macos", "x86_64"): "osx-x64",
+        ("macos", "aarch64"): "osx-arm64",
+        ("linux", "x86_64"): "linux-x64",
+        ("linux", "aarch64"): "linux-arm64",
+    }
+    try:
+        return platforms[(os_name, arch)]
+    except KeyError as error:
+        raise ValueError(f"Unsupported platform: {os_name}/{arch}") from error
 
 
-def install_deps():
-    if not (working_dir / "deps" / "bin").exists():
-        print('Please download the MaaFramework to "deps" first.')
-        print('请先下载 MaaFramework 到 "deps"。')
-        sys.exit(1)
+def install_deps(
+    source_root: Path,
+    destination: Path,
+    os_name: str,
+    arch: str,
+) -> None:
+    deps = source_root / "deps"
+    if not (deps / "bin").exists():
+        raise FileNotFoundError('Please download MaaFramework to "deps" first.')
 
     if os_name == "android":
+        shutil.copytree(deps / "bin", destination, dirs_exist_ok=True)
         shutil.copytree(
-            working_dir / "deps" / "bin",
-            install_path,
+            deps / "share" / "MaaAgentBinary",
+            destination / "MaaAgentBinary",
             dirs_exist_ok=True,
         )
-        shutil.copytree(
-            working_dir / "deps" / "share" / "MaaAgentBinary",
-            install_path / "MaaAgentBinary",
-            dirs_exist_ok=True,
-        )
-    else:
-        shutil.copytree(
-            working_dir / "deps" / "bin",
-            install_path / "runtimes" / get_dotnet_platform_tag() / "native",
-            ignore=shutil.ignore_patterns(
-                "*MaaDbgControlUnit*",
-                "*MaaThriftControlUnit*",
-                "*MaaRpc*",
-                "*MaaHttp*",
-                "plugins",
-                "*.node",
-                "*MaaPiCli*",
-            ),
-            dirs_exist_ok=True,
-        )
-        shutil.copytree(
-            working_dir / "deps" / "share" / "MaaAgentBinary",
-            install_path / "libs" / "MaaAgentBinary",
-            dirs_exist_ok=True,
-        )
-        shutil.copytree(
-            working_dir / "deps" / "bin" / "plugins",
-            install_path / "plugins" / get_dotnet_platform_tag(),
-            dirs_exist_ok=True,
-        )
+        return
 
-
-
-def install_resource():
-
-    configure_ocr_model()
-
+    platform_tag = get_dotnet_platform_tag(os_name, arch)
     shutil.copytree(
-        working_dir / "assets" / "resource",
-        install_path / "resource",
+        deps / "bin",
+        destination / "runtimes" / platform_tag / "native",
+        ignore=shutil.ignore_patterns(
+            "*MaaDbgControlUnit*",
+            "*MaaThriftControlUnit*",
+            "*MaaRpc*",
+            "*MaaHttp*",
+            "plugins",
+            "*.node",
+            "*MaaPiCli*",
+        ),
         dirs_exist_ok=True,
     )
-    shutil.copy2(
-        working_dir / "assets" / "interface.json",
-        install_path,
-    )
-
-    with open(install_path / "interface.json", "r", encoding="utf-8") as f:
-        interface = jsonc.load(f)
-
-    interface["version"] = version
-
-    with open(install_path / "interface.json", "w", encoding="utf-8") as f:
-        jsonc.dump(interface, f, ensure_ascii=False, indent=4)
-
-
-def install_chores():
-    shutil.copy2(
-        working_dir / "README.md",
-        install_path,
-    )
-    shutil.copy2(
-        working_dir / "LICENSE",
-        install_path,
-    )
-
-
-def install_agent():
     shutil.copytree(
-        working_dir / "agent",
-        install_path / "agent",
+        deps / "share" / "MaaAgentBinary",
+        destination / "libs" / "MaaAgentBinary",
         dirs_exist_ok=True,
     )
+    shutil.copytree(
+        deps / "bin" / "plugins",
+        destination / "plugins" / platform_tag,
+        dirs_exist_ok=True,
+    )
+
+
+def install_project_files(
+    source_root: Path,
+    destination: Path,
+    release_version: str,
+) -> None:
+    """Copy project-owned release files without local development output."""
+    shutil.copytree(
+        source_root / "assets" / "resource",
+        destination / "resource",
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        dirs_exist_ok=True,
+    )
+    shutil.copy2(source_root / "assets" / "interface.json", destination)
+
+    interface_path = destination / "interface.json"
+    with interface_path.open("r", encoding="utf-8") as stream:
+        interface = jsonc.load(stream)
+    interface["version"] = release_version
+    with interface_path.open("w", encoding="utf-8") as stream:
+        jsonc.dump(interface, stream, ensure_ascii=False, indent=4)
+
+    shutil.copytree(
+        source_root / "agent",
+        destination / "agent",
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        dirs_exist_ok=True,
+    )
+    shutil.copy2(source_root / "README.md", destination)
+    shutil.copy2(source_root / "LICENSE", destination)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = sys.argv if argv is None else argv
+    if len(args) < 4:
+        print("Usage: python install.py <version> <os> <arch>")
+        print("Example: python install.py v1.0.0 win x86_64")
+        return 1
+
+    release_version, os_name, arch = args[1:4]
+    source_root = Path(__file__).parent.parent.resolve()
+    destination = source_root / "install"
+
+    try:
+        configure_ocr_model()
+        install_deps(source_root, destination, os_name, arch)
+        install_project_files(source_root, destination, release_version)
+    except (FileNotFoundError, ValueError) as error:
+        print(error)
+        return 1
+
+    print(f"Install to {destination} successfully.")
+    return 0
 
 
 if __name__ == "__main__":
-    install_deps()
-    install_resource()
-    install_chores()
-    install_agent()
-
-    print(f"Install to {install_path} successfully.")
+    raise SystemExit(main())

@@ -1,6 +1,6 @@
 # PR 规范
 
-本文档用于说明向 MaaPracticeBoilerplate 提交 Pull Request（PR）时的基本约定，也可作为基于本模板创建 MaaFramework 项目后的协作参考。
+本文档用于说明向 MAA_marvel 提交 Pull Request（PR）时的基本约定。
 
 ## 基本原则
 

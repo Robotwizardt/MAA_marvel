@@ -1,43 +1,67 @@
-<!-- markdownlint-disable MD033 MD041 -->
-<p align="center">
-  <img alt="LOGO" src="https://cdn.jsdelivr.net/gh/MaaAssistantArknights/design@main/v1/icons/maa-logo_512x512.png" width="256" height="256" />
-</p>
+# MAA_marvel
 
-<div align="center">
+面向国服《漫威终极逆转》的 MaaFramework 自动化项目。目前第一阶段聚焦“征服模式自动对战”，参考 booster-bot 的状态机思路实现持续匹配、出牌、结算和异常恢复。
 
-# MaaPracticeBoilerplate
+## 当前支持范围
 
-</div>
+- 国服安卓客户端，画面基准为竖屏 `720×1280`。
+- 优先支持 MuMu 模拟器 12；其他模拟器需要提供标准 ADB 连接并保持相同分辨率。
+- 征服模式：试炼之地、白银、黄金、无限四档入口识别。
+- 随机出牌与阿加莎托管是主要策略；OCR 选牌仅供测试，识别不可靠时会停止本回合，不会回退成随机操作。
+- 支持 SNAP、指定回合后撤退、对局数/运行时间上限、匹配超时和异常重启。
 
-本仓库为 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 所提供的项目模板，开发者可基于此模板直接创建自己的 MaaXXX 项目。
+暂不支持天梯和限时活动，这两类玩法属于后续阶段。
 
-> **MaaFramework** 是基于图像识别技术、运用 [MAA](https://github.com/MaaAssistantArknights/MaaAssistantArknights) 开发经验去芜存菁、完全重写的新一代自动化黑盒测试框架。
-> 低代码的同时仍拥有高扩展性，旨在打造一款丰富、领先、且实用的开源库，助力开发者轻松编写出更好的黑盒测试程序，并推广普及。
+## 安装与启动
 
-## 即刻开始
+1. 下载并解压对应平台的发布包，不要改变包内 `agent`、`resource` 和 `interface.json` 的相对位置。
+2. 安装 Python，然后在发布包根目录执行：
 
-**请不要直接克隆本仓库！你应该通过模板创建自己的项目！**  
+   ```powershell
+   python -m pip install -r agent/requirements.txt
+   ```
 
-请阅读 [如何开发](./docs/zh_cn/develop/how_to_develop.md)。
+3. 使用兼容 MaaFramework Interface V2 的通用界面加载此项目。
+4. 在控制器中选择 `ADB`，连接 MuMu 12 的游戏实例，确认显示分辨率为 `720×1280`。
+5. 保持国服游戏已登录，选择“征服模式自动对战”，检查配置后开始。
 
-向本模板仓库提交改动前，请阅读 [PR 规范](./docs/zh_cn/develop/pull_request_guidelines.md)。
+MuMu 12 找不到设备时，请先在模拟器设置中开启 ADB/调试功能，再重新扫描设备。不要同时选择多个模拟器实例。
 
-## 生态共建
+## 配置默认值
 
-MAA 正计划建设为一类项目，而非舟的单一软件。
+| 配置 | 默认值 | 说明 |
+| --- | --- | --- |
+| 出牌策略 | 随机出牌 | 另有阿加莎托管、OCR 选牌（实验） |
+| 最高征服档位 | 试炼之地 | 选择更高档后会按策略向下寻找可用入口 |
+| 无票行为 | 回退试炼之地 | 也可选择停止任务 |
+| 自动撤退 | 关闭 | 可设为完成第 1–6 回合后撤退 |
+| 撤退后 | 继续下一轮 | 也可认输整场 |
+| SNAP | 关闭 | 固定概率模式默认概率为 46% |
+| 最大对局数 | 0 | 0 表示不限制 |
+| 最大运行分钟 | 0 | 0 表示不限制 |
+| 匹配超时 | 600 秒 | 超时进入恢复流程 |
+| 异常时自动重启 | 开启 | 关闭后遇到需重启的异常会停止 |
 
-若您的项目依赖于 MaaFramework，我们欢迎您将它命名为 MaaXXX, MXA, MAX 等等。当然，这是许可而不是限制，您也可以自由选择其他与 MAA 无关的名字，完全取决于您自己的想法！
+## 付费与安全保护
 
-同时，我们也非常欢迎您提出 PR，在 [社区项目列表](https://github.com/MaaXYZ/MaaFramework#%E7%A4%BE%E5%8C%BA%E9%A1%B9%E7%9B%AE) 中添加上您的项目！
+项目不会自动购买征服门票，也不会点击任何金块支付入口。进入档位前会同时检查档位、门票与付费提示；状态不明确时选择停止或回退，不猜测点击。
 
-## 常见问题
+建议首次使用时保持默认的试炼之地与随机/阿加莎策略，并观察完整一局。OCR 模式仍在采集和调试阶段，不建议无人值守使用。
 
-请阅读 [常见问题](./docs/zh_cn/develop/faq.md)。
+任务停止、恢复、无票、识别失败和超时的原因会写入 MaaFramework 日志。排查问题时请保留 `debug` 目录中的日志和对应时间点截图。
 
-## 鸣谢
+## 开发与验收
 
-本项目由 **[MaaFramework](https://github.com/MaaXYZ/MaaFramework)** 强力驱动！
+- Python 测试：`python -m unittest discover -s tests -v`
+- Maa 资源检查：`npx @nekosu/maa-tools check`
+- 真机/模拟器验收步骤见 [ADB 验收清单](docs/testing/adb-acceptance.md)。
 
-感谢以下开发者对本项目作出的贡献（下面链接改成你自己的项目地址）:
+## 来源说明
 
-[![Contributors](https://contrib.rocks/image?repo=MaaXYZ/MaaFramework&max=1000)](https://github.com/MaaXYZ/MaaFramework/graphs/contributors)
+本项目以 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 为运行框架。
+
+[booster-bot](https://github.com/little-fort/booster-bot) 仅用于参考征服模式自动化的状态机和流程拆分思路；本项目没有复制其代码或图像资源，识别模板、Maa Pipeline 和 Python Agent 均针对国服客户端独立实现。
+
+## 许可证
+
+本项目使用 [MIT License](LICENSE)。游戏名称、画面和相关商标归各自权利人所有。
