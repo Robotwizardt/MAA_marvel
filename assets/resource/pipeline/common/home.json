@@ -1,0 +1,60 @@
+{
+    "公共-主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "common/main/game_modes.png",
+                "roi": [
+                    420,
+                    1080,
+                    180,
+                    200
+                ],
+                "threshold": 0.78
+            }
+        },
+        "next": [
+            "征服-打开模式列表"
+        ]
+    },
+    "公共-模式列表": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "common/main/modes_header.png",
+                "roi": [
+                    190,
+                    0,
+                    340,
+                    120
+                ],
+                "threshold": 0.8
+            }
+        },
+        "next": [
+            "征服-查找模式卡片"
+        ]
+    },
+    "公共-退出游戏取消": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "recovery/exit/no.png",
+                "roi": [
+                    100,
+                    630,
+                    290,
+                    170
+                ],
+                "threshold": 0.82
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "公共-识别当前页面"
+        ]
+    }
+}
