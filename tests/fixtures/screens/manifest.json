@@ -1,0 +1,109 @@
+{
+    "templates": [
+        {
+            "source": "tests/fixtures/screens/main/home.png",
+            "output": "assets/resource/image/common/main/game_modes.png",
+            "box": [450, 1110, 130, 170],
+            "positive_nodes": ["公共-主界面"],
+            "negative_sources": ["tests/fixtures/screens/main/modes.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/main/modes.png",
+            "output": "assets/resource/image/common/main/modes_header.png",
+            "box": [250, 5, 220, 85],
+            "positive_nodes": ["公共-模式列表"],
+            "negative_sources": ["tests/fixtures/screens/main/home.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/main/modes_lower.png",
+            "output": "assets/resource/image/conquest/navigation/mode_card.png",
+            "box": [235, 380, 270, 90],
+            "positive_nodes": ["征服-模式卡片"],
+            "negative_sources": ["tests/fixtures/screens/main/modes.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/tier_proving_grounds.png",
+            "output": "assets/resource/image/conquest/tier/proving_grounds_title.png",
+            "box": [240, 135, 260, 100],
+            "positive_nodes": ["征服-试炼之地标题"],
+            "negative_sources": ["tests/fixtures/screens/conquest/tier_infinite_paid.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/tier_infinite_paid.png",
+            "output": "assets/resource/image/conquest/tier/infinite_title.png",
+            "box": [210, 135, 340, 100],
+            "positive_nodes": ["征服-无限标题"],
+            "negative_sources": ["tests/fixtures/screens/conquest/tier_proving_grounds.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/tier_proving_grounds.png",
+            "output": "assets/resource/image/conquest/entry/free_enter.png",
+            "box": [205, 965, 310, 120],
+            "positive_nodes": ["征服-点击免费进入"],
+            "negative_sources": ["tests/fixtures/screens/conquest/tier_infinite_paid.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/tier_infinite_paid.png",
+            "output": "assets/resource/image/conquest/entry/gold_cost_button.png",
+            "box": [205, 965, 310, 120],
+            "positive_nodes": ["征服-金块入口"],
+            "negative_sources": ["tests/fixtures/screens/conquest/tier_proving_grounds.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/tier_infinite_paid.png",
+            "output": "assets/resource/image/conquest/entry/gold_icon.png",
+            "box": [285, 990, 70, 55],
+            "positive_nodes": ["征服-金块图标"],
+            "negative_sources": ["tests/fixtures/screens/conquest/tier_proving_grounds.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/tier_infinite_paid.png",
+            "output": "assets/resource/image/conquest/entry/ticket_status.png",
+            "box": [385, 1070, 105, 70],
+            "positive_nodes": ["征服-门票状态"],
+            "negative_sources": ["tests/fixtures/screens/conquest/tier_proving_grounds.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/prematch_clean.png",
+            "output": "assets/resource/image/conquest/prematch/battle.png",
+            "box": [200, 965, 320, 130],
+            "positive_nodes": ["征服-点击开战"],
+            "negative_sources": ["tests/fixtures/screens/conquest/tier_proving_grounds.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/prematch_clean.png",
+            "output": "assets/resource/image/conquest/prematch/delete.png",
+            "box": [80, 965, 180, 115],
+            "positive_nodes": ["征服-赛前删除负样本"],
+            "negative_sources": ["tests/fixtures/screens/conquest/tier_proving_grounds.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/prematch_clean.png",
+            "output": "assets/resource/image/conquest/prematch/shop.png",
+            "box": [510, 965, 140, 115],
+            "positive_nodes": ["征服-赛前商店负样本"],
+            "negative_sources": ["tests/fixtures/screens/conquest/tier_proving_grounds.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/conquest/active_run.png",
+            "output": "assets/resource/image/conquest/active/back.png",
+            "box": [50, 130, 80, 85],
+            "positive_nodes": ["征服-进行中返回"],
+            "negative_sources": ["tests/fixtures/screens/conquest/prematch_clean.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/recovery/exit_confirmation.png",
+            "output": "assets/resource/image/recovery/exit/no.png",
+            "box": [130, 670, 225, 90],
+            "positive_nodes": ["公共-退出游戏取消"],
+            "negative_sources": ["tests/fixtures/screens/conquest/prematch_clean.png"]
+        },
+        {
+            "source": "tests/fixtures/screens/recovery/exit_confirmation.png",
+            "output": "assets/resource/image/recovery/exit/yes.png",
+            "box": [365, 670, 225, 90],
+            "positive_nodes": ["公共-退出游戏确认负样本"],
+            "negative_sources": ["tests/fixtures/screens/conquest/prematch_clean.png"]
+        }
+    ]
+}
