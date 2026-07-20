@@ -1,0 +1,414 @@
+{
+    "征服-选择档位候选": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRouteConquestTier",
+                "custom_action_param": {}
+            }
+        },
+        "next": [
+            "征服-准备试炼之地",
+            "征服-准备白银",
+            "征服-准备黄金",
+            "征服-准备无限",
+            "公共-安全停止"
+        ]
+    },
+    "征服-准备试炼之地": {
+        "next": [
+            "征服-试炼重置1"
+        ]
+    },
+    "征服-试炼重置1": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-试炼重置2"]
+    },
+    "征服-试炼重置2": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-试炼重置3"]
+    },
+    "征服-试炼重置3": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-确认试炼候选"]
+    },
+    "征服-准备白银": {
+        "next": ["征服-白银重置1"]
+    },
+    "征服-白银重置1": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-白银重置2"]
+    },
+    "征服-白银重置2": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-白银重置3"]
+    },
+    "征服-白银重置3": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-白银左移1"]
+    },
+    "征服-白银左移1": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [600, 520],
+                "end": [180, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-确认白银候选"]
+    },
+    "征服-准备黄金": {
+        "next": ["征服-黄金重置1"]
+    },
+    "征服-黄金重置1": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-黄金重置2"]
+    },
+    "征服-黄金重置2": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-黄金重置3"]
+    },
+    "征服-黄金重置3": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-黄金左移1"]
+    },
+    "征服-黄金左移1": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [600, 520],
+                "end": [180, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-黄金左移2"]
+    },
+    "征服-黄金左移2": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [600, 520],
+                "end": [180, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-确认黄金候选"]
+    },
+    "征服-准备无限": {
+        "next": ["征服-无限重置1"]
+    },
+    "征服-无限重置1": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-无限重置2"]
+    },
+    "征服-无限重置2": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-无限重置3"]
+    },
+    "征服-无限重置3": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [180, 520],
+                "end": [600, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-无限左移1"]
+    },
+    "征服-无限左移1": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [600, 520],
+                "end": [180, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-无限左移2"]
+    },
+    "征服-无限左移2": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [600, 520],
+                "end": [180, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-无限左移3"]
+    },
+    "征服-无限左移3": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [600, 520],
+                "end": [180, 520],
+                "duration": 400
+            }
+        },
+        "post_delay": 700,
+        "next": ["征服-确认无限候选"]
+    },
+    "征服-确认试炼候选": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/tier/proving_grounds_title.png",
+                "roi": [180, 110, 360, 150],
+                "threshold": 0.8
+            }
+        },
+        "next": ["征服-金块入口", "征服-付费确认", "征服-安全入口确认", "征服-拒绝当前档位"]
+    },
+    "征服-确认白银候选": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [180, 110, 360, 150],
+                "expected": ["白银征服模式"]
+            }
+        },
+        "next": ["征服-金块入口", "征服-付费确认", "征服-安全入口确认", "征服-拒绝当前档位"]
+    },
+    "征服-确认黄金候选": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [180, 110, 360, 150],
+                "expected": ["黄金征服模式"]
+            }
+        },
+        "next": ["征服-金块入口", "征服-付费确认", "征服-安全入口确认", "征服-拒绝当前档位"]
+    },
+    "征服-确认无限候选": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/tier/infinite_title.png",
+                "roi": [170, 110, 380, 150],
+                "threshold": 0.8
+            }
+        },
+        "next": ["征服-金块入口", "征服-付费确认", "征服-安全入口确认", "征服-拒绝当前档位"]
+    },
+    "征服-证据-免费进入": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/entry/free_enter.png",
+                "roi": [180, 930, 360, 190],
+                "threshold": 0.82
+            }
+        }
+    },
+    "征服-证据-门票可用": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [230, 1050, 300, 100],
+                "expected": ["已拥有[1-9][0-9]*/[1-9][0-9]*"]
+            }
+        }
+    },
+    "征服-证据-金块图标": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/entry/gold_icon.png",
+                "roi": [230, 930, 260, 160],
+                "threshold": 0.82
+            }
+        }
+    },
+    "征服-证据-金块金额": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/entry/gold_cost_button.png",
+                "roi": [180, 930, 360, 190],
+                "threshold": 0.8
+            }
+        }
+    },
+    "征服-证据-付费确认": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [100, 350, 520, 500],
+                "expected": ["购买", "确认支付"]
+            }
+        }
+    },
+    "征服-金块入口": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/entry/gold_cost_button.png",
+                "roi": [180, 930, 360, 190],
+                "threshold": 0.8
+            }
+        },
+        "next": ["征服-拒绝当前档位"]
+    },
+    "征服-付费确认": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [100, 350, 520, 500],
+                "expected": ["购买", "确认支付"]
+            }
+        },
+        "next": ["征服-拒绝当前档位"]
+    },
+    "征服-安全入口确认": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSafeEntry",
+                "custom_recognition_param": {
+                    "tier": "current"
+                }
+            }
+        },
+        "next": ["征服-点击免费进入", "征服-点击门票进入"],
+        "timeout": 5000,
+        "on_error": ["征服-拒绝当前档位"]
+    },
+    "征服-点击免费进入": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/entry/free_enter.png",
+                "roi": [180, 930, 360, 190],
+                "threshold": 0.82
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": ["征服-赛前页面"],
+        "on_error": ["公共-恢复决策"]
+    },
+    "征服-点击门票进入": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [180, 930, 360, 190],
+                "expected": ["进入"]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": ["征服-赛前页面"],
+        "on_error": ["公共-恢复决策"]
+    },
+    "征服-拒绝当前档位": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRouteConquestTier",
+                "custom_action_param": {}
+            }
+        },
+        "next": ["征服-准备试炼之地", "征服-准备白银", "征服-准备黄金", "征服-准备无限", "公共-安全停止"]
+    }
+}

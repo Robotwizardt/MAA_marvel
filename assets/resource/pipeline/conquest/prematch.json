@@ -1,0 +1,75 @@
+{
+    "征服-赛前页面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/prematch/battle.png",
+                "roi": [
+                    170,
+                    920,
+                    380,
+                    210
+                ],
+                "threshold": 0.78
+            }
+        },
+        "next": [
+            "征服-点击开战"
+        ]
+    },
+    "征服-点击开战": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/prematch/battle.png",
+                "roi": [
+                    170,
+                    920,
+                    380,
+                    210
+                ],
+                "threshold": 0.78
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "公共-比赛开始"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-赛前删除负样本": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/prematch/delete.png",
+                "roi": [
+                    60,
+                    920,
+                    220,
+                    200
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "征服-赛前商店负样本": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/prematch/shop.png",
+                "roi": [
+                    480,
+                    920,
+                    190,
+                    200
+                ],
+                "threshold": 0.8
+            }
+        }
+    }
+}

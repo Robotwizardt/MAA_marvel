@@ -1,0 +1,217 @@
+{
+    "征服-任务入口": {
+        "next": [
+            "征服-初始化会话"
+        ]
+    },
+    "征服-初始化会话": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "play_strategy": "random",
+                    "max_tier": "proving_grounds",
+                    "no_ticket": "fallback",
+                    "retreat_after_turn": 0,
+                    "after_retreat": "continue",
+                    "snap_mode": "off",
+                    "snap_probability": 46,
+                    "max_matches": 0,
+                    "max_minutes": 0,
+                    "matchmaking_timeout_seconds": 600,
+                    "auto_restart": true
+                }
+            }
+        },
+        "next": [
+            "公共-启动游戏"
+        ]
+    },
+    "征服-打开模式列表": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "common/main/game_modes.png",
+                "roi": [
+                    420,
+                    1080,
+                    180,
+                    200
+                ],
+                "threshold": 0.78
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": [
+            "公共-模式列表"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-查找模式卡片": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/navigation/mode_card.png",
+                "roi": [
+                    40,
+                    250,
+                    640,
+                    760
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1800,
+        "next": [
+            "征服-进行中页面",
+            "征服-试炼之地标题",
+            "征服-白银标题",
+            "征服-黄金标题",
+            "征服-无限标题",
+            "征服-赛前页面"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-滚动模式列表": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "common/main/modes_header.png",
+                "roi": [
+                    190,
+                    0,
+                    340,
+                    120
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    360,
+                    950
+                ],
+                "end": [
+                    360,
+                    350
+                ],
+                "duration": 500
+            }
+        },
+        "post_delay": 800,
+        "max_hit": 3,
+        "next": [
+            "征服-查找模式卡片",
+            "征服-滚动模式列表"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-进行中页面": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    40,
+                    250,
+                    640,
+                    450
+                ],
+                "expected": [
+                    "对战[0-9]+"
+                ]
+            }
+        },
+        "next": [
+            "征服-点击开战"
+        ]
+    },
+    "征服-试炼之地标题": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/tier/proving_grounds_title.png",
+                "roi": [
+                    180,
+                    110,
+                    360,
+                    150
+                ],
+                "threshold": 0.8
+            }
+        },
+        "next": [
+            "征服-选择档位候选"
+        ]
+    },
+    "征服-白银标题": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    180,
+                    110,
+                    360,
+                    150
+                ],
+                "expected": [
+                    "白银征服模式"
+                ]
+            }
+        },
+        "next": [
+            "征服-选择档位候选"
+        ]
+    },
+    "征服-黄金标题": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    180,
+                    110,
+                    360,
+                    150
+                ],
+                "expected": [
+                    "黄金征服模式"
+                ]
+            }
+        },
+        "next": [
+            "征服-选择档位候选"
+        ]
+    },
+    "征服-无限标题": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "conquest/tier/infinite_title.png",
+                "roi": [
+                    170,
+                    110,
+                    380,
+                    150
+                ],
+                "threshold": 0.8
+            }
+        },
+        "next": [
+            "征服-选择档位候选"
+        ]
+    }
+}
