@@ -455,3 +455,8 @@ debug
 
 # Local Git worktrees
 .worktrees/
+
+# Local development and ADB captures
+.venv/
+.tmp/
+tests/artifacts/

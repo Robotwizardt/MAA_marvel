@@ -1,1 +1,4 @@
 json-with-comments
+jsonschema==4.26.0
+referencing==0.37.0
+Pillow>=10.4.0,<13

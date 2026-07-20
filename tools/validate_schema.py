@@ -145,7 +145,7 @@ def validate_file(file_path, validator):
         errors = list(validator.iter_errors(data))
 
         if errors:
-            print(f"\n❌ Validation failed for {file_path}:")
+            print(f"\n[ERROR] Validation failed for {file_path}:")
             print(f"   Found {len(errors)} error(s):")
             for idx, error in enumerate(errors[:10], 1):
                 path = "/" + "/".join(str(p) for p in error.path) if error.path else "/"
@@ -163,10 +163,10 @@ def validate_file(file_path, validator):
                     )
             return False
 
-        print(f"✓ {file_path}")
+        print(f"[OK] {file_path}")
         return True
     except Exception as e:
-        print(f"\n❌ Error validating {file_path}: {e}")
+        print(f"\n[ERROR] Error validating {file_path}: {e}")
         # 输出GitHub Actions格式的错误注解
         print(f"::error file={file_path},title=Validation Error::{e}")
         return False
@@ -365,10 +365,10 @@ def main():
             )
 
     if all_valid:
-        print("\n✅ All validations passed!")
+        print("\n[SUCCESS] All validations passed!")
         sys.exit(0)
     else:
-        print("\n❌ Some validations failed!")
+        print("\n[ERROR] Some validations failed!")
         sys.exit(1)
 
 
