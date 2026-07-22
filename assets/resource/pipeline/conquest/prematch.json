@@ -109,16 +109,17 @@
     },
     "征服-赛前商店负样本": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "conquest/prematch/shop.png",
                 "roi": [
                     480,
                     920,
                     190,
                     200
                 ],
-                "threshold": 0.8
+                "expected": [
+                    "^商店$"
+                ]
             }
         }
     }

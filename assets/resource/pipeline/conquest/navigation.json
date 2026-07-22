@@ -12,13 +12,13 @@
                 "custom_action_param": {
                     "play_strategy": "random",
                     "max_tier": "proving_grounds",
-                    "no_ticket": "fallback",
+                    "no_ticket": "stop",
                     "retreat_after_turn": 0,
                     "after_retreat": "continue",
                     "snap_mode": "off",
                     "snap_probability": 46,
-                    "max_matches": 0,
-                    "max_minutes": 0,
+                    "max_matches": 1,
+                    "max_minutes": 30,
                     "matchmaking_timeout_seconds": 600,
                     "auto_restart": true
                 }
@@ -34,10 +34,10 @@
             "param": {
                 "template": "common/main/game_modes.png",
                 "roi": [
-                    420,
-                    1080,
-                    180,
-                    200
+                    450,
+                    1120,
+                    140,
+                    140
                 ],
                 "threshold": 0.78
             }
@@ -45,7 +45,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 1500,
+        "post_delay": 3000,
         "next": [
             "公共-模式列表"
         ],
@@ -55,16 +55,17 @@
     },
     "征服-查找模式卡片": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "conquest/navigation/mode_card.png",
                 "roi": [
                     40,
-                    250,
+                    150,
                     640,
-                    760
+                    1050
                 ],
-                "threshold": 0.8
+                "expected": [
+                    "征服模式"
+                ]
             }
         },
         "action": {
@@ -142,16 +143,17 @@
     },
     "征服-试炼之地标题": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "conquest/tier/proving_grounds_title.png",
                 "roi": [
                     180,
                     110,
                     360,
                     150
                 ],
-                "threshold": 0.8
+                "expected": [
+                    "试炼之地"
+                ]
             }
         },
         "next": [

@@ -63,12 +63,59 @@ class BattlePipelineTests(unittest.TestCase):
 
         battle_wait = next_names(self.nodes["公共-等待战斗状态"])
         self.assertIn("公共-战斗继续", battle_wait)
+        self.assertIn("征服-结果继续", battle_wait)
+
+        state_wait = next_names(self.nodes["公共-等待新状态"])
+        self.assertIn("征服-结果继续", state_wait)
 
         node = self.nodes["公共-战斗继续"]
         self.assertEqual(node["recognition"]["type"], "OCR")
         self.assertIn("^继续$", node["recognition"]["param"]["expected"])
         self.assertEqual(node["action"]["type"], "Click")
         self.assertNotIn("target", node["action"].get("param", {}))
+
+    def test_bootstrap_waits_on_loading_screen_and_recognizes_all_tier_lobbies(self) -> None:
+        bootstrap = next_names(self.nodes["公共-识别当前页面"])
+        self.assertEqual(bootstrap[0], "公共-启动加载中")
+        self.assertEqual(bootstrap[1], "公共-启动活动弹窗")
+        self.assertEqual(bootstrap[2], "公共-累计签到奖励")
+        self.assertIn("征服-白银标题", bootstrap)
+        self.assertIn("征服-黄金标题", bootstrap)
+        loading = self.nodes["公共-启动加载中"]
+        self.assertEqual(
+            loading["recognition"]["param"]["expected"],
+            ["prod-[0-9.]+"],
+        )
+        self.assertEqual(next_names(loading), ["公共-识别当前页面"])
+        popup = self.nodes["公共-启动活动弹窗"]
+        self.assertEqual(
+            popup["recognition"]["param"]["expected"],
+            ["立即前往"],
+        )
+        self.assertEqual(
+            popup["action"],
+            {"type": "Click", "param": {"target": [570, 140, 100, 120]}},
+        )
+        reward = self.nodes["公共-累计签到奖励"]
+        self.assertEqual(reward["recognition"]["param"]["expected"], ["累签大奖"])
+        self.assertEqual(
+            reward["action"],
+            {"type": "Click", "param": {"target": [300, 1140, 120, 130]}},
+        )
+
+    def test_exit_confirmation_cancel_uses_live_exact_ocr(self) -> None:
+        node = self.nodes["公共-退出游戏取消"]
+        self.assertEqual(node["recognition"]["type"], "OCR")
+        self.assertEqual(node["recognition"]["param"]["roi"], [100, 630, 290, 170])
+        self.assertEqual(node["recognition"]["param"]["expected"], ["^否$"])
+
+    def test_reconnect_uses_live_bottom_button(self) -> None:
+        node = self.nodes["公共-重新连接"]
+        self.assertEqual(node["recognition"]["param"]["roi"], [150, 900, 420, 250])
+        self.assertEqual(
+            node["recognition"]["param"]["expected"],
+            ["^重新连接$", "^重连$"],
+        )
 
     def test_play_turn_is_reached_only_after_stop_gate(self) -> None:
         self.assertEqual(self.predecessors("公共-执行出牌"), {"公共-停止跳过"})
@@ -85,6 +132,27 @@ class BattlePipelineTests(unittest.TestCase):
             recognition["param"]["custom_recognition_param"]["command"],
             "should_snap",
         )
+        click_recognition = self.nodes["公共-点击SNAP"]["recognition"]
+        self.assertEqual(click_recognition["param"]["roi"], [280, 40, 160, 170])
+        self.assertEqual(click_recognition["param"]["expected"], ["^[1248]$"])
+
+    def test_post_play_state_router_handles_end_turn_and_transitions(self) -> None:
+        next_nodes = self.nodes["公共-出牌后状态"]["next"]
+        self.assertEqual(next_nodes[0], "公共-结束回合")
+        self.assertIn("公共-战斗继续", next_nodes)
+        self.assertIn("公共-新回合", next_nodes)
+        self.assertNotIn("公共-结束回合", self.nodes["公共-等待新状态"]["next"])
+        self.assertEqual(self.nodes["公共-SNAP跳过"]["next"], ["公共-出牌后状态"])
+        self.assertEqual(self.nodes["公共-点击SNAP"]["next"], ["公共-出牌后状态"])
+
+    def test_waiting_opponent_accepts_live_waiting_label(self) -> None:
+        expected = self.nodes["公共-等待对手"]["recognition"]["param"]["expected"]
+        self.assertIn("等待中", expected)
+
+    def test_zero_energy_accepts_live_ocr_letter_variant(self) -> None:
+        recognition = self.nodes["公共-零能量"]["recognition"]
+        self.assertEqual(recognition["param"]["roi"], [290, 1120, 140, 160])
+        self.assertEqual(recognition["param"]["expected"], ["^[0O]$"])
 
     def test_retreat_click_is_reached_only_from_retreat_gate(self) -> None:
         self.assertEqual(self.predecessors("公共-点击撤退"), {"公共-撤退命中"})
@@ -93,6 +161,14 @@ class BattlePipelineTests(unittest.TestCase):
             recognition["param"]["custom_recognition_param"]["command"],
             "should_retreat",
         )
+
+    def test_retreat_click_uses_live_bottom_left_button(self) -> None:
+        recognition = self.nodes["公共-点击撤退"]["recognition"]
+        self.assertEqual(recognition["param"]["roi"], [0, 1050, 250, 230])
+        self.assertEqual(recognition["param"]["expected"], ["^(撤退|放弃)$"])
+        confirmation = self.nodes["公共-确认撤退"]["recognition"]
+        self.assertEqual(confirmation["param"]["roi"], [40, 780, 340, 280])
+        self.assertEqual(confirmation["param"]["expected"], ["现在撤退"])
 
     def test_concede_is_reached_only_from_after_retreat_gate(self) -> None:
         self.assertEqual(
@@ -150,6 +226,11 @@ class BattlePipelineTests(unittest.TestCase):
             x, _, width, _ = params["roi"]
             self.assertEqual(x + width, 720, name)
 
+    def test_whole_match_continue_accepts_clipped_live_label(self) -> None:
+        params = self.nodes["征服-结果继续"]["recognition"]["param"]
+        self.assertEqual(params["roi"], [80, 650, 640, 590])
+        self.assertIn("^下一$", params["expected"])
+
     def test_whole_match_result_does_not_match_lobby_victory_count(self) -> None:
         expected = self.nodes["征服-整场结果"]["recognition"]["param"]["expected"]
         self.assertNotIn("胜利", expected)
@@ -168,7 +249,7 @@ class BattlePipelineTests(unittest.TestCase):
     def test_zero_energy_recognition_exists_for_random_strategy(self) -> None:
         node = self.nodes["公共-零能量"]
         self.assertEqual(node["recognition"]["type"], "OCR")
-        self.assertIn("^0$", node["recognition"]["param"]["expected"])
+        self.assertIn("^[0O]$", node["recognition"]["param"]["expected"])
 
 
 if __name__ == "__main__":

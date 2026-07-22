@@ -65,14 +65,14 @@ class InterfaceContractTests(unittest.TestCase):
         self.assertEqual(
             options["征服-最高档位"]["default_case"], "proving_grounds"
         )
-        self.assertEqual(options["征服-无票行为"]["default_case"], "fallback")
+        self.assertEqual(options["征服-无票行为"]["default_case"], "stop")
         self.assertEqual(options["征服-自动撤退"]["default_case"], "off")
         self.assertEqual(options["征服-撤退后"]["default_case"], "continue")
         self.assertEqual(options["征服-SNAP"]["default_case"], "off")
         self.assertEqual(options["征服-SNAP概率"]["inputs"][0]["default"], "46")
-        self.assertEqual(options["征服-最大对局数"]["inputs"][0]["default"], "0")
+        self.assertEqual(options["征服-最大对局数"]["inputs"][0]["default"], "1")
         self.assertEqual(
-            options["征服-最大运行分钟"]["inputs"][0]["default"], "0"
+            options["征服-最大运行分钟"]["inputs"][0]["default"], "30"
         )
         self.assertEqual(options["征服-匹配超时"]["inputs"][0]["default"], "600")
         self.assertEqual(options["征服-自动重启"]["default_case"], "Yes")

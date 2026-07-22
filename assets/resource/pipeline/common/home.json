@@ -5,10 +5,10 @@
             "param": {
                 "template": "common/main/game_modes.png",
                 "roi": [
-                    420,
-                    1080,
-                    180,
-                    200
+                    450,
+                    1120,
+                    140,
+                    140
                 ],
                 "threshold": 0.78
             }
@@ -38,16 +38,17 @@
     },
     "公共-退出游戏取消": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "recovery/exit/no.png",
                 "roi": [
                     100,
                     630,
                     290,
                     170
                 ],
-                "threshold": 0.82
+                "expected": [
+                    "^否$"
+                ]
             }
         },
         "action": {

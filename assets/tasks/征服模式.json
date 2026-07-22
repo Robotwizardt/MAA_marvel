@@ -149,7 +149,7 @@
         "征服-无票行为": {
             "type": "select",
             "label": "无票行为",
-            "default_case": "fallback",
+            "default_case": "stop",
             "cases": [
                 {
                     "name": "fallback",
@@ -420,7 +420,7 @@
             "inputs": [
                 {
                     "name": "最大对局数",
-                    "default": "0",
+                    "default": "1",
                     "pipeline_type": "int",
                     "verify": "^(0|[1-9][0-9]*)$",
                     "pattern_msg": "请输入非负整数"
@@ -445,7 +445,7 @@
             "inputs": [
                 {
                     "name": "最大运行分钟",
-                    "default": "0",
+                    "default": "30",
                     "pipeline_type": "int",
                     "verify": "^(0|[1-9][0-9]*)$",
                     "pattern_msg": "请输入非负整数"

@@ -15,10 +15,12 @@ class SessionConfigTests(unittest.TestCase):
         config = SessionConfig.from_mapping({})
         self.assertEqual(config.play_strategy, PlayStrategy.RANDOM)
         self.assertEqual(config.max_tier, ConquestTier.PROVING_GROUNDS)
-        self.assertEqual(config.no_ticket, NoTicketBehavior.FALLBACK)
+        self.assertEqual(config.no_ticket, NoTicketBehavior.STOP)
         self.assertEqual(config.after_retreat, AfterRetreat.CONTINUE)
         self.assertEqual(config.snap_mode, SnapMode.OFF)
         self.assertEqual(config.snap_probability, 46)
+        self.assertEqual(config.max_matches, 1)
+        self.assertEqual(config.max_minutes, 30)
         self.assertEqual(config.matchmaking_timeout_seconds, 600)
         self.assertTrue(config.auto_restart)
 

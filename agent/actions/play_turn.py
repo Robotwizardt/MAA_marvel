@@ -13,6 +13,10 @@ from agent.strategies.random_play import LANE_TARGETS, build_random_plan
 RNG = random.Random()
 
 
+def _recognition_hit(detail: object | None) -> bool:
+    return detail is not None and getattr(detail, "box", None) is not None
+
+
 def _box_center(box: object) -> tuple[int, int]:
     if isinstance(box, (list, tuple)):
         x, y, width, height = box
@@ -49,7 +53,7 @@ class PlayTurn(CustomAction):
             if not job.succeeded:
                 return False
             image = controller.post_screencap().get(wait=True)
-            if context.run_recognition("公共-零能量", image) is not None:
+            if _recognition_hit(context.run_recognition("公共-零能量", image)):
                 break
         return True
 

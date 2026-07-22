@@ -114,14 +114,14 @@ class OcrAdapterTests(unittest.TestCase):
         self.assertEqual(result.detail["reason"], "low_confidence")
 
     def test_ocr_play_failure_never_falls_back_to_random_swipes(self) -> None:
-        STORE.configure({"play_strategy": "ocr"}, now=0.0)
+        STORE.configure({"play_strategy": "ocr", "max_matches": 0, "max_minutes": 0}, now=0.0)
         context = FakePlayContext([None])
         self.assertTrue(PlayTurn().run(context, SimpleNamespace()))
         self.assertEqual(context.last_entry, "公共-OCR选牌")
         self.assertEqual(context.controller.swipes, [])
 
     def test_ocr_play_drags_selected_card_then_stops_on_next_miss(self) -> None:
-        STORE.configure({"play_strategy": "ocr"}, now=0.0)
+        STORE.configure({"play_strategy": "ocr", "max_matches": 0, "max_minutes": 0}, now=0.0)
         selected = SimpleNamespace(box=SimpleNamespace(x=360, y=1010, w=80, h=100))
         context = FakePlayContext([selected, None])
         self.assertTrue(PlayTurn().run(context, SimpleNamespace()))
@@ -131,6 +131,21 @@ class OcrAdapterTests(unittest.TestCase):
         self.assertTrue(85 <= x2 <= 635)
         self.assertTrue(600 <= y2 <= 720)
         self.assertEqual(duration, 350)
+
+    def test_random_play_ignores_failed_zero_energy_result(self) -> None:
+        STORE.configure({"play_strategy": "random", "max_matches": 0, "max_minutes": 0}, now=0.0)
+        failed = SimpleNamespace(box=None)
+        context = FakePlayContext([failed] * 8)
+        self.assertTrue(PlayTurn().run(context, SimpleNamespace()))
+        self.assertEqual(len(context.controller.swipes), 8)
+
+    def test_random_play_stops_only_on_zero_energy_hit(self) -> None:
+        STORE.configure({"play_strategy": "random", "max_matches": 0, "max_minutes": 0}, now=0.0)
+        failed = SimpleNamespace(box=None)
+        hit = SimpleNamespace(box=SimpleNamespace(x=300, y=1130, w=80, h=80))
+        context = FakePlayContext([failed, failed, hit])
+        self.assertTrue(PlayTurn().run(context, SimpleNamespace()))
+        self.assertEqual(len(context.controller.swipes), 3)
 
 
 if __name__ == "__main__":

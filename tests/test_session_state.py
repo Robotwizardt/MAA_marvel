@@ -31,7 +31,10 @@ class SessionStateTests(unittest.TestCase):
         self.assertEqual(state.stop_reason, StopReason.MAX_RUNTIME)
 
     def test_zero_limits_do_not_stop_the_session(self) -> None:
-        state = SessionState(SessionConfig(), started_at=0.0)
+        state = SessionState(
+            SessionConfig(max_matches=0, max_minutes=0),
+            started_at=0.0,
+        )
         state.completed_matches = 500
         self.assertFalse(state.should_stop(100_000.0))
 

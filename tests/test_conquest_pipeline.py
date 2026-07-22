@@ -71,12 +71,42 @@ class ConquestPipelineTests(unittest.TestCase):
             ["征服-查找模式卡片", "征服-滚动模式列表"],
         )
 
+    def test_conquest_card_uses_exact_mode_title_ocr(self) -> None:
+        node = self.nodes["征服-查找模式卡片"]
+        self.assertEqual(node["recognition"]["type"], "OCR")
+        self.assertEqual(node["recognition"]["param"]["roi"], [40, 150, 640, 1050])
+        self.assertEqual(node["recognition"]["param"]["expected"], ["征服模式"])
+
+    def test_mode_entry_waits_for_transition_then_requires_mode_list(self) -> None:
+        opening = self.nodes["征服-打开模式列表"]
+        self.assertGreaterEqual(opening["post_delay"], 3000)
+        self.assertEqual(next_names(opening), ["公共-模式列表"])
+        self.assertEqual(
+            opening["recognition"]["param"]["roi"],
+            [450, 1120, 140, 140],
+        )
+
     def test_entry_clicks_have_only_safe_gate_as_direct_predecessor(self) -> None:
         for target in ("征服-点击免费进入", "征服-点击门票进入"):
             predecessors = {
                 name for name, node in self.nodes.items() if target in next_names(node)
             }
             self.assertEqual(predecessors, {"征服-安全入口确认"})
+
+    def test_ticket_evidence_and_click_share_current_button_ocr(self) -> None:
+        evidence = self.nodes["征服-证据-门票可用"]["recognition"]["param"]
+        click = self.nodes["征服-点击门票进入"]["recognition"]["param"]
+
+        self.assertEqual(evidence, click)
+        self.assertIn("[1-9][0-9]*/[1-9][0-9]*", evidence["expected"])
+        self.assertEqual(evidence["roi"], [230, 930, 300, 150])
+        self.assertEqual(self.nodes["征服-点击门票进入"]["action"]["type"], "Click")
+
+    def test_proving_grounds_title_uses_live_ocr_text(self) -> None:
+        for name in ("征服-试炼之地标题", "征服-确认试炼候选"):
+            recognition = self.nodes[name]["recognition"]
+            self.assertEqual(recognition["type"], "OCR")
+            self.assertEqual(recognition["param"]["expected"], ["试炼之地"])
 
     def test_safe_gate_uses_custom_recognition(self) -> None:
         recognition = self.nodes["征服-安全入口确认"]["recognition"]
@@ -119,6 +149,11 @@ class ConquestPipelineTests(unittest.TestCase):
         self.assertEqual(confirm["action"]["type"], "Click")
         self.assertNotIn("target", confirm["action"].get("param", {}))
         self.assertEqual(next_names(confirm), ["公共-比赛开始"])
+
+    def test_prematch_shop_negative_sample_uses_exact_ocr(self) -> None:
+        recognition = self.nodes["征服-赛前商店负样本"]["recognition"]
+        self.assertEqual(recognition["type"], "OCR")
+        self.assertEqual(recognition["param"]["expected"], ["^商店$"])
 
     def test_deck_confirmation_fixture_matches_reference_resolution(self) -> None:
         path = ROOT / "tests" / "fixtures" / "screens" / "conquest" / "deck_confirmation.png"

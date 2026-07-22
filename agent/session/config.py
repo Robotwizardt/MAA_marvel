@@ -36,13 +36,13 @@ class SnapMode(str, Enum):
 class SessionConfig:
     play_strategy: PlayStrategy = PlayStrategy.RANDOM
     max_tier: ConquestTier = ConquestTier.PROVING_GROUNDS
-    no_ticket: NoTicketBehavior = NoTicketBehavior.FALLBACK
+    no_ticket: NoTicketBehavior = NoTicketBehavior.STOP
     retreat_after_turn: int = 0
     after_retreat: AfterRetreat = AfterRetreat.CONTINUE
     snap_mode: SnapMode = SnapMode.OFF
     snap_probability: int = 46
-    max_matches: int = 0
-    max_minutes: int = 0
+    max_matches: int = 1
+    max_minutes: int = 30
     matchmaking_timeout_seconds: int = 600
     auto_restart: bool = True
     unknown_timeout_seconds: int = 120
@@ -57,13 +57,13 @@ class SessionConfig:
         config = cls(
             play_strategy=PlayStrategy(values.get("play_strategy", "random")),
             max_tier=ConquestTier(values.get("max_tier", "proving_grounds")),
-            no_ticket=NoTicketBehavior(values.get("no_ticket", "fallback")),
+            no_ticket=NoTicketBehavior(values.get("no_ticket", "stop")),
             retreat_after_turn=int(values.get("retreat_after_turn", 0)),
             after_retreat=AfterRetreat(values.get("after_retreat", "continue")),
             snap_mode=SnapMode(values.get("snap_mode", "off")),
             snap_probability=int(values.get("snap_probability", 46)),
-            max_matches=int(values.get("max_matches", 0)),
-            max_minutes=int(values.get("max_minutes", 0)),
+            max_matches=int(values.get("max_matches", 1)),
+            max_minutes=int(values.get("max_minutes", 30)),
             matchmaking_timeout_seconds=int(
                 values.get("matchmaking_timeout_seconds", 600)
             ),
