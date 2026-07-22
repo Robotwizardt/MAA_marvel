@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import importlib
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -37,6 +38,8 @@ class InstallLayoutTests(unittest.TestCase):
             expected = {
                 "interface.json",
                 "resource",
+                "tasks",
+                "tasks/征服模式.json",
                 "agent",
                 "agent/requirements.txt",
                 "README.md",
@@ -50,6 +53,38 @@ class InstallLayoutTests(unittest.TestCase):
             self.assertFalse((destination / ".venv").exists())
             self.assertFalse(any(destination.rglob("__pycache__")))
             self.assertFalse(any(destination.rglob("*.pyc")))
+
+            interface = installer.jsonc.loads(
+                (destination / "interface.json").read_text("utf-8")
+            )
+            for imported in interface["import"]:
+                self.assertTrue((destination / imported).is_file(), imported)
+
+    def test_release_uses_bundled_agent_when_available(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir, imported_installer() as installer:
+            source = Path(temp_dir) / "source"
+            shutil.copytree(ROOT / "assets", source / "assets")
+            shutil.copytree(ROOT / "agent", source / "agent")
+            shutil.copy2(ROOT / "README.md", source)
+            shutil.copy2(ROOT / "LICENSE", source)
+            bundle = source / "agent_dist" / "MAA_marvel_agent"
+            bundle.mkdir(parents=True)
+            (bundle / "MAA_marvel_agent.exe").write_bytes(b"agent")
+
+            destination = Path(temp_dir) / "install"
+            installer.install_project_files(source, destination, "v-test", "win")
+
+            interface = installer.jsonc.loads(
+                (destination / "interface.json").read_text("utf-8")
+            )
+            self.assertEqual(
+                interface["agent"]["child_exec"],
+                "./agent_runtime/MAA_marvel_agent.exe",
+            )
+            self.assertEqual(interface["agent"]["child_args"], [])
+            self.assertTrue(
+                (destination / "agent_runtime" / "MAA_marvel_agent.exe").is_file()
+            )
 
             completed = subprocess.run(
                 [str(PYTHON), "-c", "import agent.main"],

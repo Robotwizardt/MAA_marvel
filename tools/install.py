@@ -83,6 +83,7 @@ def install_project_files(
     source_root: Path,
     destination: Path,
     release_version: str,
+    os_name: str | None = None,
 ) -> None:
     """Copy project-owned release files without local development output."""
     shutil.copytree(
@@ -92,11 +93,28 @@ def install_project_files(
         dirs_exist_ok=True,
     )
     shutil.copy2(source_root / "assets" / "interface.json", destination)
+    shutil.copytree(
+        source_root / "assets" / "tasks",
+        destination / "tasks",
+        dirs_exist_ok=True,
+    )
 
     interface_path = destination / "interface.json"
     with interface_path.open("r", encoding="utf-8") as stream:
         interface = jsonc.load(stream)
     interface["version"] = release_version
+    agent_bundle = source_root / "agent_dist" / "MAA_marvel_agent"
+    if os_name != "android" and agent_bundle.exists():
+        shutil.copytree(
+            agent_bundle,
+            destination / "agent_runtime",
+            dirs_exist_ok=True,
+        )
+        executable = "MAA_marvel_agent.exe" if os_name == "win" else "MAA_marvel_agent"
+        interface["agent"] = {
+            "child_exec": f"./agent_runtime/{executable}",
+            "child_args": [],
+        }
     with interface_path.open("w", encoding="utf-8") as stream:
         jsonc.dump(interface, stream, ensure_ascii=False, indent=4)
 
@@ -124,7 +142,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         configure_ocr_model()
         install_deps(source_root, destination, os_name, arch)
-        install_project_files(source_root, destination, release_version)
+        install_project_files(source_root, destination, release_version, os_name)
     except (FileNotFoundError, ValueError) as error:
         print(error)
         return 1

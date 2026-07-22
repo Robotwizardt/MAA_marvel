@@ -72,11 +72,18 @@ jobs:
 
   install:
     needs: meta
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
-        os: [win, macos, linux, android]
-        arch: [aarch64, x86_64]
+        include:
+          - { os: win, arch: x86_64, runner: windows-latest }
+          - { os: win, arch: aarch64, runner: windows-11-arm }
+          - { os: macos, arch: x86_64, runner: macos-15-intel }
+          - { os: macos, arch: aarch64, runner: macos-15 }
+          - { os: linux, arch: x86_64, runner: ubuntu-24.04 }
+          - { os: linux, arch: aarch64, runner: ubuntu-24.04-arm }
+          - { os: android, arch: x86_64, runner: ubuntu-latest }
+          - { os: android, arch: aarch64, runner: ubuntu-latest }
       fail-fast: false
 
     steps:
@@ -137,13 +144,20 @@ jobs:
           fi
 
           cd tools/
-          python -m pip install -r ./requirements.txt
+          python -m pip install -r ./requirements.txt -r ../agent/requirements.txt pyinstaller
+          if [[ "${{ matrix.os }}" != "android" ]]; then
+            cd ..
+            python -m PyInstaller --noconfirm --clean --onedir \
+              --name MAA_marvel_agent --paths . --collect-all maa \
+              --distpath agent_dist agent/main.py
+            cd tools/
+          fi
           python ./install.py ${{ needs.meta.outputs.tag }} ${{ matrix.os }} ${{ matrix.arch }}
           cd ..
 
       - uses: actions/upload-artifact@v4
         with:
-          name: MaaXXX-${{ matrix.os }}-${{ matrix.arch }}
+          name: MAA-marvel-${{ matrix.os }}-${{ matrix.arch }}
           path: "install"
 
   changelog:
