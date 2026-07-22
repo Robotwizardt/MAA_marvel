@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "packageVersion": "0.1.1",
+  "target": "codex",
+  "scope": "project",
+  "profile": "core",
+  "skills": {
+    "maa-cli-operate": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-cli-operate",
+      "hash": "d87b3425b31920dbd706269f87ac2380cb6c764e184b89a98752f89ffea0dc42"
+    },
+    "maa-pipeline-generate": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-pipeline-generate",
+      "hash": "fd48b63fad5a45cc22cc4783d599e854ee1014d7aedcebb78237421aba38c65b"
+    },
+    "maa-pipeline-graph": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-pipeline-graph",
+      "hash": "3b48f7cdc5d8b7f5f1720badd41aa50de1eb0e821d27066dfdae9f611d3c2a96"
+    },
+    "maa-pipeline-guide": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-pipeline-guide",
+      "hash": "526b261c5bbda7288ec83731f52b7fe338e79392a235a5468cf127c25469d7b1"
+    },
+    "maa-pipeline-history-audit": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-pipeline-history-audit",
+      "hash": "b2c74122f32619afb31256194d864b1097c6e29b6606010aacf4182a36ce29ec"
+    },
+    "maa-pipeline-option": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-pipeline-option",
+      "hash": "2de3af52e829d2dffca596e555bf3245d019df3424b5eccd8db4919c56cc65f4"
+    },
+    "maa-pipeline-testing": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-pipeline-testing",
+      "hash": "3b167cd23f5d1df7093981d27904a29e5464c86aeca75ce94497d143105260e0"
+    },
+    "maa-project-create": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-project-create",
+      "hash": "31785892334034285cfc7bd2cd2cad611f51b3f51527705db1cd3efe1cbe64cb"
+    },
+    "maa-project-init": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-project-init",
+      "hash": "1c9158329eef8ca6570aa4e6347eb718aa7e9e680a7c03d8ee91784da0b89696"
+    },
+    "maa-workflow-build": {
+      "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.agents\\skills\\maa-workflow-build",
+      "hash": "7f479af25954114cc79d5cb304530190cf29abd5ad1ea19b1630019d95a6b7af"
+    }
+  },
+  "mcp": {
+    "type": "codex-toml",
+    "path": "C:\\Users\\admin\\Desktop\\my_maa\\MAA_marvel\\.codex\\config.toml",
+    "servers": {
+      "maa-mcp": {
+        "command": "uvx",
+        "args": [
+          "--from",
+          "maa-mcp==1.2.3",
+          "maa-mcp"
+        ]
+      }
+    },
+    "block": "# BEGIN EVERYTHING-MAA MCP\n[mcp_servers.maa-mcp]\ncommand = \"uvx\"\nargs = [\"--from\", \"maa-mcp==1.2.3\", \"maa-mcp\"]\n# END EVERYTHING-MAA MCP"
+  }
+}
