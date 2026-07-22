@@ -1,5 +1,8 @@
 name: install
 
+permissions:
+  contents: write
+
 env:
   # 版本控制：
   # - 设置 VERSION 为空字符串时，下载 latest 版本
