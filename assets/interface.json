@@ -5,7 +5,7 @@
     "license": "MIT",
     "welcome": "请选择 MuMu 12 或其他 720×1280 安卓模拟器后开始任务。",
     "github": "https://github.com/Robotwizardt/MAA_marvel",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "controller": [
         {
             "name": "安卓端",
