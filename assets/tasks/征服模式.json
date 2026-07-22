@@ -3,6 +3,7 @@
         {
             "name": "征服模式自动对战",
             "entry": "征服-任务入口",
+            "default_check": true,
             "resource": [
                 "官服"
             ],

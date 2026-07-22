@@ -39,6 +39,7 @@ class InterfaceContractTests(unittest.TestCase):
         task = self.task_file["task"][0]
         self.assertEqual(task["name"], "征服模式自动对战")
         self.assertEqual(task["entry"], "征服-任务入口")
+        self.assertTrue(task["default_check"])
         self.assertEqual(task["resource"], ["官服"])
         self.assertEqual(task["controller"], ["安卓端"])
 
