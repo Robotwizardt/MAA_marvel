@@ -446,6 +446,9 @@ deps/tools/*
 !deps/tools/*.schema.json
 build
 install
+dist/
+agent_dist/
+MAA_marvel_agent.spec
 
 # Tools
 tools/ImageCropper/**/*.png

@@ -176,7 +176,11 @@ class ConquestPipelineTests(unittest.TestCase):
         self.assertEqual(selection["recognition"]["param"]["expected"], ["^$"])
         self.assertEqual(selection["action"]["type"], "Click")
         self.assertEqual(next_names(selection), ["征服-点击开战"])
-        self.assertEqual(selection["on_error"], ["征服-点击开战"])
+        self.assertEqual(selection["on_error"], ["征服-卡组未找到回退"])
+        self.assertEqual(
+            next_names(self.nodes["征服-卡组未找到回退"]),
+            ["征服-点击开战"],
+        )
 
     def test_prematch_requires_conquest_match_number_and_battle_button(self) -> None:
         recognition = self.nodes["征服-赛前页面"]["recognition"]
