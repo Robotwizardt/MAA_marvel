@@ -5,6 +5,7 @@ from agent.session.state import SessionState
 
 
 def parse_json_object(raw: str) -> dict[str, Any]:
+    """解析 Custom 参数，并保证顶层一定是 JSON 对象。"""
     value = json.loads(raw)
     if not isinstance(value, dict):
         raise ValueError("custom parameter must be a JSON object")
@@ -16,6 +17,7 @@ def apply_event(
     event: str,
     value: object | None = None,
 ) -> None:
+    """集中处理 Pipeline 事件名，防止各 Action 随意修改 SessionState。"""
     if event == "match_started":
         state.begin_match()
         return

@@ -5,6 +5,7 @@ import unittest
 from PIL import Image
 
 from agent.recognitions.safe_entry import SafeEntry
+from agent.runtime.store import STORE
 from tools.validate_schema import load_jsonc
 
 
@@ -27,8 +28,9 @@ def next_names(node: dict[str, object]) -> list[str]:
 
 
 class FakeRecognitionContext:
-    def __init__(self, matches: set[str]) -> None:
+    def __init__(self, matches: set[str], ticket_texts: tuple[str, ...] = ()) -> None:
         self.matches = matches
+        self.ticket_texts = ticket_texts
 
     def run_recognition(
         self,
@@ -38,6 +40,11 @@ class FakeRecognitionContext:
     ) -> object:
         box = (1, 1, 10, 10) if entry in self.matches else None
         return SimpleNamespace(box=box)
+
+    def run_recognition_direct(self, reco_type, reco_param, image):
+        return SimpleNamespace(
+            filtered_results=[SimpleNamespace(text=text) for text in self.ticket_texts]
+        )
 
 
 class ConquestPipelineTests(unittest.TestCase):
@@ -59,6 +66,7 @@ class ConquestPipelineTests(unittest.TestCase):
             "征服-安全入口确认",
             "征服-点击免费进入",
             "征服-点击门票进入",
+            "征服-选择指定卡组",
             "征服-点击开战",
             "征服-确认卡组页面",
             "征服-确认使用卡组",
@@ -82,9 +90,32 @@ class ConquestPipelineTests(unittest.TestCase):
         self.assertGreaterEqual(opening["post_delay"], 3000)
         self.assertEqual(next_names(opening), ["公共-模式列表"])
         self.assertEqual(
-            opening["recognition"]["param"]["roi"],
-            [450, 1120, 140, 140],
+            opening["recognition"]["param"]["all_of"],
+            ["公共-首页开战按钮", "公共-首页标签"],
         )
+        self.assertEqual(
+            opening["action"]["param"]["target"],
+            [480, 1120, 100, 140],
+        )
+
+    def test_home_requires_battle_button_and_home_tab(self) -> None:
+        recognition = self.nodes["公共-主界面"]["recognition"]
+        self.assertEqual(recognition["type"], "And")
+        self.assertEqual(
+            recognition["param"]["all_of"],
+            ["公共-首页开战按钮", "公共-首页标签"],
+        )
+
+    def test_conquest_disables_training_before_opening_mode_list(self) -> None:
+        self.assertEqual(
+            next_names(self.nodes["公共-主界面"]),
+            ["天梯-主页模式命中", "征服-关闭训练模式", "征服-打开模式列表"],
+        )
+        toggle = self.nodes["征服-关闭训练模式"]
+        self.assertEqual(toggle["recognition"]["type"], "ColorMatch")
+        self.assertEqual(toggle["recognition"]["param"]["roi"], [420, 900, 90, 60])
+        self.assertEqual(toggle["action"]["type"], "Click")
+        self.assertEqual(next_names(toggle), ["征服-打开模式列表"])
 
     def test_entry_clicks_have_only_safe_gate_as_direct_predecessor(self) -> None:
         for target in ("征服-点击免费进入", "征服-点击门票进入"):
@@ -93,13 +124,14 @@ class ConquestPipelineTests(unittest.TestCase):
             }
             self.assertEqual(predecessors, {"征服-安全入口确认"})
 
-    def test_ticket_evidence_and_click_share_current_button_ocr(self) -> None:
+    def test_ticket_evidence_reads_zero_but_click_requires_positive_count(self) -> None:
         evidence = self.nodes["征服-证据-门票可用"]["recognition"]["param"]
         click = self.nodes["征服-点击门票进入"]["recognition"]["param"]
 
-        self.assertEqual(evidence, click)
-        self.assertIn("[1-9][0-9]*/[1-9][0-9]*", evidence["expected"])
-        self.assertEqual(evidence["roi"], [230, 930, 300, 150])
+        self.assertEqual(evidence["roi"], click["roi"])
+        self.assertEqual(evidence["roi"], [170, 900, 380, 250])
+        self.assertIn("[0-9]+/1", evidence["expected"])
+        self.assertIn("[1-9][0-9]*/1", click["expected"])
         self.assertEqual(self.nodes["征服-点击门票进入"]["action"]["type"], "Click")
 
     def test_proving_grounds_title_uses_live_ocr_text(self) -> None:
@@ -125,6 +157,7 @@ class ConquestPipelineTests(unittest.TestCase):
         self.assertEqual(node["recognition"]["type"], "OCR")
         self.assertEqual(node["recognition"]["param"]["expected"], ["^开战$"])
         self.assertEqual(node["action"]["type"], "Click")
+        self.assertEqual(node["pre_delay"], 2500)
         self.assertNotIn("target", node["action"].get("param", {}))
 
         x, y, width, height = node["recognition"]["param"]["roi"]
@@ -132,6 +165,35 @@ class ConquestPipelineTests(unittest.TestCase):
         self.assertLessEqual(x + width, 480)
         self.assertGreaterEqual(y, 950)
         self.assertLessEqual(y + height, 1100)
+
+    def test_deck_selection_is_optional_and_falls_back_to_current_deck(self) -> None:
+        self.assertEqual(
+            next_names(self.nodes["征服-赛前页面"]),
+            ["征服-选择指定卡组", "征服-点击开战"],
+        )
+        selection = self.nodes["征服-选择指定卡组"]
+        self.assertEqual(selection["recognition"]["type"], "OCR")
+        self.assertEqual(selection["recognition"]["param"]["expected"], ["^$"])
+        self.assertEqual(selection["action"]["type"], "Click")
+        self.assertEqual(next_names(selection), ["征服-点击开战"])
+        self.assertEqual(selection["on_error"], ["征服-点击开战"])
+
+    def test_prematch_requires_conquest_match_number_and_battle_button(self) -> None:
+        recognition = self.nodes["征服-赛前页面"]["recognition"]
+        self.assertEqual(recognition["type"], "And")
+        self.assertEqual(
+            recognition["param"]["all_of"],
+            ["征服-赛前对战编号", "征服-赛前开战按钮"],
+        )
+        self.assertEqual(recognition["param"]["box_index"], 1)
+        self.assertEqual(
+            self.nodes["征服-赛前对战编号"]["recognition"]["param"]["expected"],
+            ["对战[0-9]+"],
+        )
+        self.assertEqual(
+            self.nodes["征服-赛前开战按钮"]["recognition"]["param"]["expected"],
+            ["^开战$"],
+        )
 
     def test_battle_click_requires_deck_confirmation_before_match_start(self) -> None:
         self.assertEqual(
@@ -168,8 +230,13 @@ class ConquestPipelineTests(unittest.TestCase):
             set(values),
             {
                 "play_strategy",
+                "lane_order",
+                "game_mode",
                 "max_tier",
-                "no_ticket",
+                "reserve_silver_tickets",
+                "reserve_gold_tickets",
+                "reserve_infinite_tickets",
+                "stop_on_daily_pass_limit",
                 "retreat_after_turn",
                 "after_retreat",
                 "snap_mode",
@@ -181,12 +248,18 @@ class ConquestPipelineTests(unittest.TestCase):
             },
         )
 
-    def analyze_entry(self, tier: str, matches: set[str]):
+    def analyze_entry(
+        self,
+        tier: str,
+        matches: set[str],
+        ticket_texts: tuple[str, ...] = (),
+    ):
+        STORE.configure({}, now=0.0)
         argv = SimpleNamespace(
             custom_recognition_param=f'{{"tier": "{tier}"}}',
             image=object(),
         )
-        return SafeEntry().analyze(FakeRecognitionContext(matches), argv)
+        return SafeEntry().analyze(FakeRecognitionContext(matches, ticket_texts), argv)
 
     def test_safe_entry_accepts_free_proving_grounds(self) -> None:
         result = self.analyze_entry(
@@ -195,15 +268,16 @@ class ConquestPipelineTests(unittest.TestCase):
         self.assertIsNotNone(result.box)
         self.assertTrue(result.detail["safe"])
 
-    def test_safe_entry_accepts_ticket_without_paid_evidence(self) -> None:
-        result = self.analyze_entry("silver", {"征服-证据-门票可用"})
+    def test_safe_entry_accepts_ticket_above_reserve_without_paid_evidence(self) -> None:
+        result = self.analyze_entry("silver", set(), ("2/1",))
         self.assertIsNotNone(result.box)
         self.assertTrue(result.detail["safe"])
 
     def test_safe_entry_rejects_gold_even_when_ticket_is_visible(self) -> None:
         result = self.analyze_entry(
             "infinite",
-            {"征服-证据-门票可用", "征服-证据-金块图标"},
+            {"征服-证据-金块图标"},
+            ("2/1",),
         )
         self.assertIsNone(result.box)
         self.assertFalse(result.detail["safe"])

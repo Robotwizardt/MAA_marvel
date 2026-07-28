@@ -10,12 +10,17 @@
             "param": {
                 "custom_action": "MarvelConfigureSession",
                 "custom_action_param": {
-                    "play_strategy": "random",
+                    "play_strategy": "ocr",
+                    "lane_order": "left_to_right",
+                    "game_mode": "conquest",
                     "max_tier": "proving_grounds",
-                    "no_ticket": "stop",
+                    "reserve_silver_tickets": 1,
+                    "reserve_gold_tickets": 1,
+                    "reserve_infinite_tickets": 1,
+                    "stop_on_daily_pass_limit": true,
                     "retreat_after_turn": 0,
                     "after_retreat": "continue",
-                    "snap_mode": "off",
+                    "snap_mode": "always",
                     "snap_probability": 46,
                     "max_matches": 1,
                     "max_minutes": 30,
@@ -30,20 +35,25 @@
     },
     "征服-打开模式列表": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "And",
             "param": {
-                "template": "common/main/game_modes.png",
-                "roi": [
-                    450,
-                    1120,
-                    140,
-                    140
+                "all_of": [
+                    "公共-首页开战按钮",
+                    "公共-首页标签"
                 ],
-                "threshold": 0.78
+                "box_index": 0
             }
         },
         "action": {
-            "type": "Click"
+            "type": "Click",
+            "param": {
+                "target": [
+                    480,
+                    1120,
+                    100,
+                    140
+                ]
+            }
         },
         "post_delay": 3000,
         "next": [
@@ -51,6 +61,38 @@
         ],
         "on_error": [
             "公共-恢复决策"
+        ]
+    },
+    "征服-关闭训练模式": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    420,
+                    900,
+                    90,
+                    60
+                ],
+                "method": 4,
+                "lower": [
+                    30,
+                    110,
+                    35
+                ],
+                "upper": [
+                    90,
+                    230,
+                    100
+                ],
+                "count": 100
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 800,
+        "next": [
+            "征服-打开模式列表"
         ]
     },
     "征服-查找模式卡片": {

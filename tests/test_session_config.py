@@ -3,7 +3,8 @@ import unittest
 from agent.session.config import (
     AfterRetreat,
     ConquestTier,
-    NoTicketBehavior,
+    GameMode,
+    LaneOrder,
     PlayStrategy,
     SessionConfig,
     SnapMode,
@@ -13,11 +14,16 @@ from agent.session.config import (
 class SessionConfigTests(unittest.TestCase):
     def test_defaults_match_approved_design(self) -> None:
         config = SessionConfig.from_mapping({})
-        self.assertEqual(config.play_strategy, PlayStrategy.RANDOM)
+        self.assertEqual(config.play_strategy, PlayStrategy.OCR)
+        self.assertEqual(config.lane_order, LaneOrder.LEFT_TO_RIGHT)
+        self.assertEqual(config.game_mode, GameMode.CONQUEST)
         self.assertEqual(config.max_tier, ConquestTier.PROVING_GROUNDS)
-        self.assertEqual(config.no_ticket, NoTicketBehavior.STOP)
+        self.assertEqual(config.reserve_silver_tickets, 1)
+        self.assertEqual(config.reserve_gold_tickets, 1)
+        self.assertEqual(config.reserve_infinite_tickets, 1)
+        self.assertTrue(config.stop_on_daily_pass_limit)
         self.assertEqual(config.after_retreat, AfterRetreat.CONTINUE)
-        self.assertEqual(config.snap_mode, SnapMode.OFF)
+        self.assertEqual(config.snap_mode, SnapMode.ALWAYS)
         self.assertEqual(config.snap_probability, 46)
         self.assertEqual(config.max_matches, 1)
         self.assertEqual(config.max_minutes, 30)
@@ -28,8 +34,13 @@ class SessionConfigTests(unittest.TestCase):
         config = SessionConfig.from_mapping(
             {
                 "play_strategy": "agatha",
+                "lane_order": "right_to_left",
+                "game_mode": "ladder",
                 "max_tier": "silver",
-                "no_ticket": "stop",
+                "reserve_silver_tickets": 2,
+                "reserve_gold_tickets": 3,
+                "reserve_infinite_tickets": 4,
+                "stop_on_daily_pass_limit": False,
                 "retreat_after_turn": 3,
                 "after_retreat": "concede",
                 "snap_mode": "probability",
@@ -41,8 +52,13 @@ class SessionConfigTests(unittest.TestCase):
             }
         )
         self.assertEqual(config.play_strategy, PlayStrategy.AGATHA)
+        self.assertEqual(config.lane_order, LaneOrder.RIGHT_TO_LEFT)
+        self.assertEqual(config.game_mode, GameMode.LADDER)
         self.assertEqual(config.max_tier, ConquestTier.SILVER)
-        self.assertEqual(config.no_ticket, NoTicketBehavior.STOP)
+        self.assertEqual(config.reserve_silver_tickets, 2)
+        self.assertEqual(config.reserve_gold_tickets, 3)
+        self.assertEqual(config.reserve_infinite_tickets, 4)
+        self.assertFalse(config.stop_on_daily_pass_limit)
         self.assertEqual(config.retreat_after_turn, 3)
         self.assertEqual(config.after_retreat, AfterRetreat.CONCEDE)
         self.assertEqual(config.snap_probability, 75)
@@ -60,6 +76,9 @@ class SessionConfigTests(unittest.TestCase):
             {"max_matches": -1},
             {"max_minutes": -1},
             {"matchmaking_timeout_seconds": 0},
+            {"reserve_silver_tickets": -1},
+            {"reserve_gold_tickets": -1},
+            {"reserve_infinite_tickets": -1},
         )
         for values in invalid_values:
             with self.subTest(values=values):
@@ -69,3 +88,5 @@ class SessionConfigTests(unittest.TestCase):
     def test_rejects_unknown_enum_values(self) -> None:
         with self.assertRaises(ValueError):
             SessionConfig.from_mapping({"play_strategy": "smart"})
+        with self.assertRaises(ValueError):
+            SessionConfig.from_mapping({"lane_order": "center_first"})

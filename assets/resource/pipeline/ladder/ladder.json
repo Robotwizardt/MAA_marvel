@@ -1,0 +1,135 @@
+{
+    "天梯-任务入口": {
+        "next": ["天梯-初始化会话"]
+    },
+    "天梯-初始化会话": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "game_mode": "ladder"
+                }
+            }
+        },
+        "next": ["公共-启动游戏"]
+    },
+    "天梯-模式证据": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {"command": "mode_is_ladder"}
+            }
+        }
+    },
+    "天梯-主页模式命中": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {"command": "mode_is_ladder"}
+            }
+        },
+        "next": ["天梯-训练模式已开启", "天梯-主页可开战"]
+    },
+    "天梯-训练模式已开启": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [420, 900, 90, 60],
+                "method": 4,
+                "lower": [30, 110, 35],
+                "upper": [90, 230, 100],
+                "count": 100
+            }
+        },
+        "action": {"type": "Click"},
+        "post_delay": 800,
+        "next": ["天梯-主页可开战"]
+    },
+    "天梯-主页可开战": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [210, 940, 300, 160],
+                "expected": ["^开战$"]
+            }
+        },
+        "action": {"type": "Click"},
+        "post_delay": 1500,
+        "next": ["天梯-等待匹配状态"],
+        "on_error": ["公共-恢复决策"]
+    },
+    "天梯-等待匹配状态": {
+        "next": [
+            "公共-匹配中",
+            "公共-首回合",
+            "公共-战斗继续",
+            "公共-重新连接",
+            "天梯-整场结果"
+        ],
+        "rate_limit": 1000,
+        "timeout": 600000,
+        "on_error": ["公共-恢复决策"]
+    },
+    "天梯-结果文字": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [0, 0, 720, 1280],
+                "expected": ["^胜利$", "^失败$", "已逃离", "比赛结束"]
+            }
+        }
+    },
+    "天梯-整场结果": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": ["天梯-模式证据", "天梯-结果文字"],
+                "box_index": 1
+            }
+        },
+        "next": [
+            "征服-每日经验上限",
+            "征服-结果继续",
+            "天梯-返回主页"
+        ]
+    },
+    "天梯-返回主页": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": ["天梯-模式证据", "公共-主界面"],
+                "box_index": 1
+            }
+        },
+        "next": ["天梯-记录完成"]
+    },
+    "天梯-记录完成": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {"event": "match_completed"}
+            }
+        },
+        "next": ["天梯-停止判断"]
+    },
+    "天梯-停止判断": {
+        "next": ["天梯-停止命中", "天梯-继续下一局"]
+    },
+    "天梯-停止命中": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {"command": "should_stop"}
+            }
+        },
+        "next": ["公共-安全停止"]
+    },
+    "天梯-继续下一局": {
+        "next": ["天梯-主页模式命中"]
+    }
+}

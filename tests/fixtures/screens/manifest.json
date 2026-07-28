@@ -1,6 +1,13 @@
 {
     "templates": [
         {
+            "source": "tests/fixtures/screens/battle/card_detail.png",
+            "output": "assets/resource/image/common/battle/detail_close.png",
+            "box": [300, 1145, 118, 100],
+            "positive_nodes": ["公共-详情关闭按钮"],
+            "negative_sources": ["tests/fixtures/screens/battle/normal_turn.png"]
+        },
+        {
             "source": "tests/fixtures/screens/main/home.png",
             "output": "assets/resource/image/common/main/game_modes.png",
             "box": [450, 1110, 130, 170],

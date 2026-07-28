@@ -12,40 +12,87 @@
             ],
             "description": "仅支持国服安卓端 720×1280；不会购买门票或消耗金块。",
             "option": [
+                "征服-选择卡组",
                 "征服-出牌策略",
+                "征服-放牌场地顺序",
                 "征服-最高档位",
-                "征服-无票行为",
+                "征服-保留门票数",
+                "征服-每日经验上限后结束",
                 "征服-自动撤退",
-                "征服-撤退后",
-                "征服-SNAP",
                 "征服-最大对局数",
                 "征服-最大运行分钟",
                 "征服-匹配超时",
                 "征服-自动重启"
             ]
+        },
+        {
+            "name": "天梯模式自动对战",
+            "entry": "天梯-任务入口",
+            "default_check": false,
+            "resource": [
+                "官服"
+            ],
+            "controller": [
+                "安卓端"
+            ],
+            "description": "从主页关闭训练模式后进入天梯匹配，复用 OCR/阿加莎出牌、SNAP、撤退和停止条件。",
+            "option": [
+                "征服-出牌策略",
+                "征服-放牌场地顺序",
+                "征服-每日经验上限后结束",
+                "征服-自动撤退",
+                "征服-最大对局数",
+                "征服-最大运行分钟",
+                "征服-匹配超时",
+                "征服-自动重启"
+            ]
+        },
+        {
+            "name": "训练模式-OCR选牌测试（单回合）",
+            "entry": "训练-OCR选牌测试入口",
+            "default_check": false,
+            "resource": [
+                "官服"
+            ],
+            "controller": [
+                "安卓端"
+            ],
+            "description": "请先手动进入训练模式并停在我方回合；反复选择当前能量可支付的最高费用牌，直到无牌可出后结束回合。",
+            "option": [
+                "征服-放牌场地顺序"
+            ]
         }
     ],
     "option": {
+        "征服-选择卡组": {
+            "type": "input",
+            "label": "选择卡组",
+            "description": "填写完整卡组名称后，在赛前页面选择同名卡组；留空或未找到时继续使用当前卡组。",
+            "inputs": [
+                {
+                    "name": "卡组名称",
+                    "label": "卡组名称",
+                    "default": "",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "征服-选择指定卡组": {
+                    "recognition": {
+                        "param": {
+                            "expected": [
+                                "^{卡组名称}$"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "征服-出牌策略": {
             "type": "select",
             "label": "出牌策略",
-            "default_case": "random",
+            "default_case": "ocr",
             "cases": [
-                {
-                    "name": "random",
-                    "label": "随机出牌",
-                    "pipeline_override": {
-                        "征服-初始化会话": {
-                            "action": {
-                                "param": {
-                                    "custom_action_param": {
-                                        "play_strategy": "random"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
                 {
                     "name": "agatha",
                     "label": "阿加莎托管",
@@ -63,14 +110,94 @@
                 },
                 {
                     "name": "ocr",
-                    "label": "OCR 选牌（实验）",
-                    "description": "识别失败时直接结束回合，不会自动回退随机策略。",
+                    "label": "OCR 智能选牌",
+                    "description": "识别当前能量和全部手牌，优先打出可支付的最高费用牌。",
                     "pipeline_override": {
                         "征服-初始化会话": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
                                         "play_strategy": "ocr"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "征服-放牌场地顺序": {
+            "type": "select",
+            "label": "放牌场地顺序",
+            "description": "决定一张牌优先尝试放入左、中、右哪个场地；场地已满时会继续尝试下一个。",
+            "default_case": "left_to_right",
+            "cases": [
+                {
+                    "name": "random",
+                    "label": "每张牌随机",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "lane_order": "random"
+                                    }
+                                }
+                            }
+                        },
+                        "训练-OCR选牌测试入口": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "lane_order": "random"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "left_to_right",
+                    "label": "从左往右",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "lane_order": "left_to_right"
+                                    }
+                                }
+                            }
+                        },
+                        "训练-OCR选牌测试入口": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "lane_order": "left_to_right"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "right_to_left",
+                    "label": "从右往左",
+                    "pipeline_override": {
+                        "征服-初始化会话": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "lane_order": "right_to_left"
+                                    }
+                                }
+                            }
+                        },
+                        "训练-OCR选牌测试入口": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "lane_order": "right_to_left"
                                     }
                                 }
                             }
@@ -147,20 +274,64 @@
                 }
             ]
         },
-        "征服-无票行为": {
-            "type": "select",
-            "label": "无票行为",
-            "default_case": "stop",
+        "征服-保留门票数": {
+            "type": "input",
+            "label": "保留门票数",
+            "description": "只有当前门票数严格大于保留数时才进入该档位，否则自动回退一级。",
+            "inputs": [
+                {
+                    "name": "保留白银门票",
+                    "label": "白银门票",
+                    "default": "10",
+                    "pipeline_type": "int",
+                    "verify": "^(0|[1-9][0-9]*)$",
+                    "pattern_msg": "请输入非负整数"
+                },
+                {
+                    "name": "保留黄金门票",
+                    "label": "黄金门票",
+                    "default": "10",
+                    "pipeline_type": "int",
+                    "verify": "^(0|[1-9][0-9]*)$",
+                    "pattern_msg": "请输入非负整数"
+                },
+                {
+                    "name": "保留无限门票",
+                    "label": "无限门票",
+                    "default": "99",
+                    "pipeline_type": "int",
+                    "verify": "^(0|[1-9][0-9]*)$",
+                    "pattern_msg": "请输入非负整数"
+                }
+            ],
+            "pipeline_override": {
+                "征服-初始化会话": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "reserve_silver_tickets": "{保留白银门票}",
+                                "reserve_gold_tickets": "{保留黄金门票}",
+                                "reserve_infinite_tickets": "{保留无限门票}"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "征服-每日经验上限后结束": {
+            "type": "switch",
+            "label": "达到每日通行证经验上限后结束",
+            "default_case": "Yes",
             "cases": [
                 {
-                    "name": "fallback",
-                    "label": "回退试炼之地",
+                    "name": "Yes",
+                    "label": "结束任务",
                     "pipeline_override": {
                         "征服-初始化会话": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
-                                        "no_ticket": "fallback"
+                                        "stop_on_daily_pass_limit": true
                                     }
                                 }
                             }
@@ -168,14 +339,14 @@
                     }
                 },
                 {
-                    "name": "stop",
-                    "label": "停止任务",
+                    "name": "No",
+                    "label": "继续对战",
                     "pipeline_override": {
                         "征服-初始化会话": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
-                                        "no_ticket": "stop"
+                                        "stop_on_daily_pass_limit": false
                                     }
                                 }
                             }
@@ -199,51 +370,6 @@
                                 "param": {
                                     "custom_action_param": {
                                         "retreat_after_turn": 0
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "turn_1",
-                    "label": "完成第 1 回合后",
-                    "pipeline_override": {
-                        "征服-初始化会话": {
-                            "action": {
-                                "param": {
-                                    "custom_action_param": {
-                                        "retreat_after_turn": 1
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "turn_2",
-                    "label": "完成第 2 回合后",
-                    "pipeline_override": {
-                        "征服-初始化会话": {
-                            "action": {
-                                "param": {
-                                    "custom_action_param": {
-                                        "retreat_after_turn": 2
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "turn_3",
-                    "label": "完成第 3 回合后",
-                    "pipeline_override": {
-                        "征服-初始化会话": {
-                            "action": {
-                                "param": {
-                                    "custom_action_param": {
-                                        "retreat_after_turn": 3
                                     }
                                 }
                             }
@@ -296,123 +422,6 @@
                     }
                 }
             ]
-        },
-        "征服-撤退后": {
-            "type": "select",
-            "label": "撤退后",
-            "default_case": "continue",
-            "cases": [
-                {
-                    "name": "continue",
-                    "label": "继续下一轮",
-                    "pipeline_override": {
-                        "征服-初始化会话": {
-                            "action": {
-                                "param": {
-                                    "custom_action_param": {
-                                        "after_retreat": "continue"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "concede",
-                    "label": "认输整场",
-                    "pipeline_override": {
-                        "征服-初始化会话": {
-                            "action": {
-                                "param": {
-                                    "custom_action_param": {
-                                        "after_retreat": "concede"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "征服-SNAP": {
-            "type": "select",
-            "label": "SNAP",
-            "default_case": "off",
-            "cases": [
-                {
-                    "name": "off",
-                    "label": "关闭",
-                    "pipeline_override": {
-                        "征服-初始化会话": {
-                            "action": {
-                                "param": {
-                                    "custom_action_param": {
-                                        "snap_mode": "off"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "probability",
-                    "label": "固定概率",
-                    "option": [
-                        "征服-SNAP概率"
-                    ],
-                    "pipeline_override": {
-                        "征服-初始化会话": {
-                            "action": {
-                                "param": {
-                                    "custom_action_param": {
-                                        "snap_mode": "probability"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "always",
-                    "label": "每局必定执行",
-                    "pipeline_override": {
-                        "征服-初始化会话": {
-                            "action": {
-                                "param": {
-                                    "custom_action_param": {
-                                        "snap_mode": "always"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "征服-SNAP概率": {
-            "type": "input",
-            "label": "SNAP 概率",
-            "inputs": [
-                {
-                    "name": "SNAP概率",
-                    "label": "0–100",
-                    "default": "46",
-                    "pipeline_type": "int",
-                    "verify": "^(100|[1-9]?[0-9])$",
-                    "pattern_msg": "请输入 0 到 100 的整数"
-                }
-            ],
-            "pipeline_override": {
-                "征服-初始化会话": {
-                    "action": {
-                        "param": {
-                            "custom_action_param": {
-                                "snap_probability": "{SNAP概率}"
-                            }
-                        }
-                    }
-                }
-            }
         },
         "征服-最大对局数": {
             "type": "input",

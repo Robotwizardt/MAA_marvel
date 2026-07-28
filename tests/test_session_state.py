@@ -46,6 +46,14 @@ class SessionStateTests(unittest.TestCase):
         state.begin_turn(4)
         self.assertTrue(state.should_retreat())
 
+    def test_blocked_lanes_only_apply_to_current_turn(self) -> None:
+        state = SessionState(SessionConfig(), started_at=0.0)
+        state.begin_match()
+        state.begin_turn(1)
+        state.blocked_lanes.update({0, 2})
+        state.begin_turn(2)
+        self.assertEqual(state.blocked_lanes, set())
+
     def test_snap_off_never_snaps(self) -> None:
         state = SessionState(SessionConfig(snap_mode=SnapMode.OFF), started_at=0.0)
         state.begin_match()

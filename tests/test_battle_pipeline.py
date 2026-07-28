@@ -23,6 +23,28 @@ def next_names(node: dict[str, object]) -> list[str]:
 
 
 class BattlePipelineTests(unittest.TestCase):
+    def test_detail_close_uses_template_not_energy_ball_color_alone(self) -> None:
+        recognition = self.nodes["公共-详情关闭按钮"]["recognition"]
+        self.assertEqual(recognition["type"], "TemplateMatch")
+        self.assertEqual(
+            recognition["param"]["template"],
+            ["common/battle/detail_close.png"],
+        )
+        self.assertEqual(recognition["param"]["roi"], [270, 1120, 180, 150])
+
+    def test_training_entries_are_single_turn_and_player_turn_guarded(self) -> None:
+        training = load_jsonc(
+            ROOT / "assets/resource/pipeline/common/training_battle.json"
+        )
+        for entry in ("训练-OCR选牌测试入口",):
+            node = training[entry]
+            self.assertEqual(node["recognition"]["type"], "OCR")
+            self.assertEqual(node["recognition"]["param"]["roi"], [500, 1120, 220, 120])
+            self.assertEqual(node["next"], ["训练-执行单回合出牌"])
+        self.assertEqual(
+            training["训练-执行单回合出牌"]["next"], ["训练-结束当前回合"]
+        )
+
     @classmethod
     def setUpClass(cls) -> None:
         cls.nodes = load_nodes()
@@ -138,12 +160,27 @@ class BattlePipelineTests(unittest.TestCase):
 
     def test_post_play_state_router_handles_end_turn_and_transitions(self) -> None:
         next_nodes = self.nodes["公共-出牌后状态"]["next"]
-        self.assertEqual(next_nodes[0], "公共-结束回合")
+        self.assertEqual(next_nodes[0], "征服-每日经验上限")
+        self.assertEqual(next_nodes[1], "公共-结束回合")
+        self.assertEqual(self.nodes["公共-出牌后状态"]["rate_limit"], 200)
         self.assertIn("公共-战斗继续", next_nodes)
         self.assertIn("公共-新回合", next_nodes)
         self.assertNotIn("公共-结束回合", self.nodes["公共-等待新状态"]["next"])
         self.assertEqual(self.nodes["公共-SNAP跳过"]["next"], ["公共-出牌后状态"])
         self.assertEqual(self.nodes["公共-点击SNAP"]["next"], ["公共-出牌后状态"])
+
+    def test_daily_pass_limit_can_stop_or_continue_from_result_flow(self) -> None:
+        limit = self.nodes["征服-每日经验上限"]
+        self.assertEqual(limit["recognition"]["type"], "OCR")
+        self.assertEqual(limit["recognition"]["param"]["roi"], [0, 0, 720, 1280])
+        gate = self.nodes["征服-每日经验上限停止"]["recognition"]
+        self.assertEqual(
+            gate["param"]["custom_recognition_param"]["command"],
+            "stop_on_daily_pass_limit",
+        )
+        self.assertEqual(next_names(self.nodes["征服-每日经验上限停止"]), ["公共-安全停止"])
+        self.assertEqual(self.nodes["征服-每日经验上限继续"]["action"]["type"], "Click")
+        self.assertIn("征服-每日经验上限", next_names(self.nodes["征服-结果后状态"]))
 
     def test_waiting_opponent_accepts_live_waiting_label(self) -> None:
         expected = self.nodes["公共-等待对手"]["recognition"]["param"]["expected"]
@@ -206,6 +243,12 @@ class BattlePipelineTests(unittest.TestCase):
         self.assertEqual(x + width, 720)
         self.assertLessEqual(y + height, 1280)
 
+    def test_round_result_accepts_prepare_battle_button_without_waiting(self) -> None:
+        for name in ("征服-轮间结果", "征服-轮间继续"):
+            expected = self.nodes[name]["recognition"]["param"]["expected"]
+            self.assertEqual(expected[0], "^准备战斗$")
+        self.assertEqual(self.nodes["公共-等待新状态"]["rate_limit"], 300)
+
     def test_match_completion_records_before_next_tier(self) -> None:
         record = self.nodes["征服-记录整场完成"]
         self.assertEqual(
@@ -246,7 +289,7 @@ class BattlePipelineTests(unittest.TestCase):
             next_names(self.nodes["公共-等待新状态"]),
         )
 
-    def test_zero_energy_recognition_exists_for_random_strategy(self) -> None:
+    def test_zero_energy_recognition_exists_for_battle_flow(self) -> None:
         node = self.nodes["公共-零能量"]
         self.assertEqual(node["recognition"]["type"], "OCR")
         self.assertIn("^[0O]$", node["recognition"]["param"]["expected"])

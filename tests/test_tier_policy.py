@@ -1,86 +1,79 @@
 import unittest
 
-from agent.conquest.tier_policy import (
-    EntryEvidence,
-    candidate_tiers,
-    choose_tier,
-    is_safe_entry,
-)
-from agent.session.config import ConquestTier, NoTicketBehavior
+from agent.conquest.tier_policy import EntryEvidence, candidate_tiers, choose_tier, is_safe_entry
+from agent.recognitions.safe_entry import parse_ticket_count
+from agent.session.config import ConquestTier
 
 
 class TierPolicyTests(unittest.TestCase):
-    def test_candidates_descend_from_allowed_maximum(self) -> None:
+    def test_candidates_descend_and_always_include_free_tier(self) -> None:
         self.assertEqual(
             candidate_tiers(ConquestTier.GOLD),
-            (
-                ConquestTier.GOLD,
-                ConquestTier.SILVER,
-                ConquestTier.PROVING_GROUNDS,
-            ),
+            (ConquestTier.GOLD, ConquestTier.SILVER, ConquestTier.PROVING_GROUNDS),
         )
 
-    def test_highest_available_paid_tier_is_selected(self) -> None:
+    def test_highest_tier_must_exceed_its_reserve(self) -> None:
         selected = choose_tier(
             ConquestTier.INFINITE,
-            {ConquestTier.SILVER, ConquestTier.GOLD},
-            NoTicketBehavior.STOP,
+            {
+                ConquestTier.INFINITE: 1,
+                ConquestTier.GOLD: 3,
+                ConquestTier.SILVER: 8,
+            },
+            {
+                ConquestTier.INFINITE: 1,
+                ConquestTier.GOLD: 2,
+                ConquestTier.SILVER: 0,
+            },
         )
         self.assertEqual(selected, ConquestTier.GOLD)
 
-    def test_proving_grounds_maximum_is_always_free_tier(self) -> None:
+    def test_all_reserved_tickets_fall_back_to_proving_grounds(self) -> None:
         selected = choose_tier(
-            ConquestTier.PROVING_GROUNDS,
-            set(),
-            NoTicketBehavior.STOP,
+            ConquestTier.INFINITE,
+            {ConquestTier.INFINITE: 1, ConquestTier.GOLD: 1, ConquestTier.SILVER: 1},
+            {ConquestTier.INFINITE: 1, ConquestTier.GOLD: 1, ConquestTier.SILVER: 1},
         )
         self.assertEqual(selected, ConquestTier.PROVING_GROUNDS)
 
-    def test_no_ticket_falls_back_or_stops(self) -> None:
-        self.assertEqual(
-            choose_tier(
-                ConquestTier.INFINITE,
-                set(),
-                NoTicketBehavior.FALLBACK,
-            ),
-            ConquestTier.PROVING_GROUNDS,
-        )
-        self.assertIsNone(
-            choose_tier(
-                ConquestTier.INFINITE,
-                set(),
-                NoTicketBehavior.STOP,
-            )
-        )
+    def test_ticket_count_parser_accepts_observed_formats(self) -> None:
+        self.assertEqual(parse_ticket_count(["6/1"]), 6)
+        self.assertEqual(parse_ticket_count(["已拥有0/1"]), 0)
+        self.assertIsNone(parse_ticket_count(["进入", "500"]))
+        self.assertIsNone(parse_ticket_count(["2/1", "3/1"]))
 
-    def test_proving_grounds_requires_only_free_evidence(self) -> None:
-        safe = EntryEvidence(
+    def test_free_tier_requires_free_evidence(self) -> None:
+        evidence = EntryEvidence(
             tier=ConquestTier.PROVING_GROUNDS,
             free_label=True,
-            ticket_label=False,
+            ticket_count=None,
+            reserve_count=0,
             gold_icon=False,
             gold_amount=False,
             paid_confirmation=False,
         )
-        self.assertTrue(is_safe_entry(safe))
+        self.assertTrue(is_safe_entry(evidence))
 
-    def test_paid_tier_requires_only_ticket_evidence(self) -> None:
-        safe = EntryEvidence(
-            tier=ConquestTier.SILVER,
+    def test_paid_tier_requires_count_strictly_above_reserve(self) -> None:
+        base = dict(
+            tier=ConquestTier.GOLD,
             free_label=False,
-            ticket_label=True,
+            reserve_count=1,
             gold_icon=False,
             gold_amount=False,
             paid_confirmation=False,
         )
-        self.assertTrue(is_safe_entry(safe))
+        self.assertTrue(is_safe_entry(EntryEvidence(ticket_count=2, **base)))
+        self.assertFalse(is_safe_entry(EntryEvidence(ticket_count=1, **base)))
+        self.assertFalse(is_safe_entry(EntryEvidence(ticket_count=0, **base)))
 
-    def test_any_paid_evidence_rejects_entry(self) -> None:
+    def test_any_paid_currency_evidence_rejects_entry(self) -> None:
         for field in ("gold_icon", "gold_amount", "paid_confirmation"):
             values = {
                 "tier": ConquestTier.INFINITE,
                 "free_label": False,
-                "ticket_label": True,
+                "ticket_count": 2,
+                "reserve_count": 1,
                 "gold_icon": False,
                 "gold_amount": False,
                 "paid_confirmation": False,
@@ -89,24 +82,6 @@ class TierPolicyTests(unittest.TestCase):
             with self.subTest(field=field):
                 self.assertFalse(is_safe_entry(EntryEvidence(**values)))
 
-    def test_conflicting_free_and_ticket_evidence_is_rejected(self) -> None:
-        evidence = EntryEvidence(
-            tier=ConquestTier.GOLD,
-            free_label=True,
-            ticket_label=True,
-            gold_icon=False,
-            gold_amount=False,
-            paid_confirmation=False,
-        )
-        self.assertFalse(is_safe_entry(evidence))
 
-    def test_missing_entry_evidence_is_rejected(self) -> None:
-        evidence = EntryEvidence(
-            tier=ConquestTier.SILVER,
-            free_label=False,
-            ticket_label=False,
-            gold_icon=False,
-            gold_amount=False,
-            paid_confirmation=False,
-        )
-        self.assertFalse(is_safe_entry(evidence))
+if __name__ == "__main__":
+    unittest.main()

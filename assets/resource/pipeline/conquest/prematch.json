@@ -1,6 +1,38 @@
 {
     "征服-赛前页面": {
         "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "征服-赛前对战编号",
+                    "征服-赛前开战按钮"
+                ],
+                "box_index": 1
+            }
+        },
+        "next": [
+            "征服-选择指定卡组",
+            "征服-点击开战"
+        ]
+    },
+    "征服-赛前对战编号": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    70,
+                    250,
+                    580,
+                    420
+                ],
+                "expected": [
+                    "对战[0-9]+"
+                ]
+            }
+        }
+    },
+    "征服-赛前开战按钮": {
+        "recognition": {
             "type": "OCR",
             "param": {
                 "roi": [
@@ -13,12 +45,37 @@
                     "^开战$"
                 ]
             }
+        }
+    },
+    "征服-选择指定卡组": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    40,
+                    250,
+                    640,
+                    720
+                ],
+                "expected": [
+                    "^$"
+                ]
+            }
         },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "timeout": 1500,
         "next": [
+            "征服-点击开战"
+        ],
+        "on_error": [
             "征服-点击开战"
         ]
     },
     "征服-点击开战": {
+        "pre_delay": 2500,
         "recognition": {
             "type": "OCR",
             "param": {

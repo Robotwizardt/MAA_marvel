@@ -1,21 +1,52 @@
 {
     "公共-主界面": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "And",
             "param": {
-                "template": "common/main/game_modes.png",
-                "roi": [
-                    450,
-                    1120,
-                    140,
-                    140
+                "all_of": [
+                    "公共-首页开战按钮",
+                    "公共-首页标签"
                 ],
-                "threshold": 0.78
+                "box_index": 0
             }
         },
         "next": [
+            "天梯-主页模式命中",
+            "征服-关闭训练模式",
             "征服-打开模式列表"
         ]
+    },
+    "公共-首页开战按钮": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    210,
+                    940,
+                    300,
+                    160
+                ],
+                "expected": [
+                    "^开战$"
+                ]
+            }
+        }
+    },
+    "公共-首页标签": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    280,
+                    1160,
+                    160,
+                    120
+                ],
+                "expected": [
+                    "^主页$"
+                ]
+            }
+        }
     },
     "公共-模式列表": {
         "recognition": {

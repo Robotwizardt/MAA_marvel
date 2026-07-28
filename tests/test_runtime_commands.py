@@ -38,27 +38,24 @@ class RuntimeCommandTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             RuntimeStore().require_state()
 
-    def test_store_builds_tier_route_with_fallback(self) -> None:
+    def test_store_builds_tier_route_with_automatic_fallback(self) -> None:
         store = RuntimeStore()
-        store.configure(
-            {"max_tier": "gold", "no_ticket": "fallback"}, now=0.0
-        )
+        store.configure({"max_tier": "gold"}, now=0.0)
         self.assertEqual(store.next_tier_candidate(), ConquestTier.GOLD)
         self.assertEqual(store.next_tier_candidate(), ConquestTier.SILVER)
         self.assertEqual(
             store.next_tier_candidate(), ConquestTier.PROVING_GROUNDS
         )
         self.assertIsNone(store.next_tier_candidate())
-        self.assertEqual(store.require_state().stop_reason, StopReason.NO_TICKET)
+        self.assertEqual(store.require_state().stop_reason, StopReason.ENTRY_UNAVAILABLE)
 
-    def test_store_stop_policy_does_not_route_to_free_tier(self) -> None:
+    def test_silver_route_always_ends_at_free_tier(self) -> None:
         store = RuntimeStore()
-        store.configure(
-            {"max_tier": "silver", "no_ticket": "stop"}, now=0.0
-        )
+        store.configure({"max_tier": "silver"}, now=0.0)
         self.assertEqual(store.next_tier_candidate(), ConquestTier.SILVER)
+        self.assertEqual(store.next_tier_candidate(), ConquestTier.PROVING_GROUNDS)
         self.assertIsNone(store.next_tier_candidate())
-        self.assertEqual(store.require_state().stop_reason, StopReason.NO_TICKET)
+        self.assertEqual(store.require_state().stop_reason, StopReason.ENTRY_UNAVAILABLE)
 
     def test_reconfigure_replaces_session_and_tier_route(self) -> None:
         store = RuntimeStore()
