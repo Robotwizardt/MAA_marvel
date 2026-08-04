@@ -4,7 +4,9 @@ import unittest
 
 from PIL import Image
 
+from agent.actions.route_conquest_tier import RouteConquestTier
 from agent.recognitions.safe_entry import SafeEntry
+from agent.session.config import ConquestTier
 from agent.runtime.store import STORE
 from tools.validate_schema import load_jsonc
 
@@ -45,6 +47,12 @@ class FakeRecognitionContext:
         return SimpleNamespace(
             filtered_results=[SimpleNamespace(text=text) for text in self.ticket_texts]
         )
+
+
+class FakeActionContext:
+    def override_next(self, node_name: str, next_nodes: list[str]) -> list[str]:
+        del node_name
+        return next_nodes
 
 
 class ConquestPipelineTests(unittest.TestCase):
@@ -186,6 +194,31 @@ class ConquestPipelineTests(unittest.TestCase):
             recognition = self.nodes[name]["recognition"]
             self.assertEqual(recognition["type"], "OCR")
             self.assertEqual(recognition["param"]["expected"], ["试炼之地"])
+            self.assertEqual(recognition["param"]["roi"], [700, 40, 520, 180])
+
+    def test_exhausted_tier_candidates_restart_and_reseed_when_enabled(self) -> None:
+        STORE.configure({}, now=0.0, checkpoint_enabled=False)
+        self.assertEqual(STORE.next_tier_candidate(), ConquestTier.PROVING_GROUNDS)
+
+        result = RouteConquestTier().run(
+            FakeActionContext(),
+            SimpleNamespace(node_name="征服-选择档位候选"),
+        )
+
+        self.assertEqual(result, ["公共-恢复重启"])
+        self.assertEqual(STORE.tier_candidates(), (ConquestTier.PROVING_GROUNDS,))
+
+    def test_exhausted_tier_candidates_wait_when_restart_is_disabled(self) -> None:
+        STORE.configure({"auto_restart": False}, now=0.0, checkpoint_enabled=False)
+        self.assertEqual(STORE.next_tier_candidate(), ConquestTier.PROVING_GROUNDS)
+
+        result = RouteConquestTier().run(
+            FakeActionContext(),
+            SimpleNamespace(node_name="征服-选择档位候选"),
+        )
+
+        self.assertEqual(result, ["征服-无可用档位等待"])
+        self.assertEqual(STORE.tier_candidates(), (ConquestTier.PROVING_GROUNDS,))
 
     def test_lobby_title_records_an_interrupted_match_before_reselecting_a_tier(self) -> None:
         for name in (
