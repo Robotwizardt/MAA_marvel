@@ -11,13 +11,23 @@ from agent.actions import (
     record_event,
     recovery,
     route_conquest_tier,
+    trace_runtime,
+    warmup,
 )
-from agent.recognitions import card_selection, safe_entry, session_gate
+from agent.runtime import event_listener
+from agent.runtime.task_cache import migrate_runtime_task_cache
+from agent.recognitions import (
+    card_selection,
+    daily_task_reward,
+    safe_entry,
+    session_gate,
+)
 
 
 def main() -> None:
     """启动 AgentServer，并通过 socket_id 与 MaaFramework 客户端通信。"""
     Toolkit.init_option("./")
+    migrate_runtime_task_cache()
     if len(sys.argv) < 2:
         raise SystemExit("Usage: python -m agent.main <socket_id>")
     # MFAAvalonia 启动 Agent 时会把通信标识符放在最后一个命令行参数中。

@@ -1,5 +1,15 @@
 {
     "征服-任务入口": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelWarmupScreencap",
+                "custom_action_param": {
+                    "timeout_ms": 60000,
+                    "interval_ms": 1000
+                }
+            }
+        },
         "next": [
             "征服-初始化会话"
         ]
@@ -17,15 +27,15 @@
                     "reserve_silver_tickets": 1,
                     "reserve_gold_tickets": 1,
                     "reserve_infinite_tickets": 1,
-                    "stop_on_daily_pass_limit": true,
+                    "stop_on_daily_pass_limit": false,
                     "retreat_after_turn": 0,
                     "after_retreat": "continue",
                     "snap_mode": "always",
                     "snap_probability": 46,
-                    "max_matches": 1,
-                    "max_minutes": 30,
+                    "claim_task_rewards_hours": 0,
                     "matchmaking_timeout_seconds": 600,
-                    "auto_restart": true
+                    "auto_restart": true,
+                    "deck_name": "0"
                 }
             }
         },
@@ -33,30 +43,144 @@
             "公共-启动游戏"
         ]
     },
+    "Config_PlayStrategy": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "play_strategy": "ocr"
+                }
+            }
+        }
+    },
+    "Config_LaneOrder": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "lane_order": "left_to_right"
+                }
+            }
+        }
+    },
+    "Config_MaxTier": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "max_tier": "proving_grounds"
+                }
+            }
+        }
+    },
+    "Config_ReserveTickets": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "reserve_silver_tickets": 10,
+                    "reserve_gold_tickets": 10,
+                    "reserve_infinite_tickets": 99
+                }
+            }
+        }
+    },
+    "Config_StopDailyPass": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "stop_on_daily_pass_limit": false
+                }
+            }
+        }
+    },
+    "Config_Retreat": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "retreat_after_turn": 0
+                }
+            }
+        }
+    },
+    "Config_ClaimTaskRewardsHours": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "claim_task_rewards_hours": 0
+                }
+            }
+        }
+    },
+    "Config_MatchmakingTimeout": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "matchmaking_timeout_seconds": 600
+                }
+            }
+        }
+    },
+    "Config_AutoRestart": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "auto_restart": true
+                }
+            }
+        }
+    },
+    "Config_DeckName": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "deck_name": "0"
+                }
+            }
+        }
+    },
     "征服-打开模式列表": {
         "recognition": {
-            "type": "And",
+            "type": "OCR",
             "param": {
-                "all_of": [
-                    "公共-首页开战按钮",
-                    "公共-首页标签"
+                "roi": [
+                    650,
+                    60,
+                    400,
+                    120
                 ],
-                "box_index": 0
-            }
-        },
-        "action": {
-            "type": "Click",
-            "param": {
-                "target": [
-                    480,
-                    1120,
-                    100,
-                    140
+                "expected": [
+                    "^游戏模式$"
                 ]
             }
         },
+        "action": {
+            "type": "Click"
+        },
         "post_delay": 3000,
         "next": [
+            "征服-进行中页面",
+            "征服-试炼之地标题",
+            "征服-白银标题",
+            "征服-黄金标题",
+            "征服-无限标题",
+            "征服-赛前页面",
             "公共-模式列表"
         ],
         "on_error": [
@@ -68,10 +192,10 @@
             "type": "ColorMatch",
             "param": {
                 "roi": [
-                    420,
-                    900,
-                    90,
-                    60
+                    1030,
+                    760,
+                    150,
+                    120
                 ],
                 "method": 4,
                 "lower": [
@@ -84,7 +208,7 @@
                     230,
                     100
                 ],
-                "count": 100
+                "count": 220
             }
         },
         "action": {
@@ -100,13 +224,13 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    40,
-                    150,
-                    640,
-                    1050
+                    620,
+                    100,
+                    700,
+                    900
                 ],
                 "expected": [
-                    "征服模式"
+                    "^征服模式$"
                 ]
             }
         },
@@ -128,37 +252,113 @@
     },
     "征服-滚动模式列表": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "common/main/modes_header.png",
                 "roi": [
-                    190,
+                    800,
                     0,
-                    340,
-                    120
+                    320,
+                    100
                 ],
-                "threshold": 0.8
+                "expected": [
+                    "^模式$"
+                ]
             }
         },
         "action": {
             "type": "Swipe",
             "param": {
                 "begin": [
-                    360,
+                    960,
                     950
                 ],
                 "end": [
-                    360,
-                    350
+                    960,
+                    180
                 ],
                 "duration": 500
             }
         },
         "post_delay": 800,
-        "max_hit": 3,
         "next": [
             "征服-查找模式卡片",
-            "征服-滚动模式列表"
+            "征服-滚动模式列表-第2次"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-滚动模式列表-第2次": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    800,
+                    0,
+                    320,
+                    100
+                ],
+                "expected": [
+                    "^模式$"
+                ]
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    960,
+                    950
+                ],
+                "end": [
+                    960,
+                    180
+                ],
+                "duration": 500
+            }
+        },
+        "post_delay": 800,
+        "next": [
+            "征服-查找模式卡片",
+            "征服-滚动模式列表-第3次"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "征服-滚动模式列表-第3次": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    800,
+                    0,
+                    320,
+                    100
+                ],
+                "expected": [
+                    "^模式$"
+                ]
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    960,
+                    950
+                ],
+                "end": [
+                    960,
+                    180
+                ],
+                "duration": 500
+            }
+        },
+        "post_delay": 800,
+        "next": [
+            "征服-查找模式卡片",
+            "公共-恢复决策"
         ],
         "on_error": [
             "公共-恢复决策"
@@ -169,10 +369,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    40,
-                    250,
-                    640,
-                    450
+                    700,
+                    180,
+                    520,
+                    520
                 ],
                 "expected": [
                     "对战[0-9]+"
@@ -188,10 +388,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    180,
-                    110,
-                    360,
-                    150
+                    700,
+                    40,
+                    520,
+                    180
                 ],
                 "expected": [
                     "试炼之地"
@@ -199,7 +399,7 @@
             }
         },
         "next": [
-            "征服-选择档位候选"
+            "征服-大厅回流判断"
         ]
     },
     "征服-白银标题": {
@@ -207,10 +407,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    180,
-                    110,
-                    360,
-                    150
+                    700,
+                    40,
+                    520,
+                    180
                 ],
                 "expected": [
                     "白银征服模式"
@@ -218,7 +418,7 @@
             }
         },
         "next": [
-            "征服-选择档位候选"
+            "征服-大厅回流判断"
         ]
     },
     "征服-黄金标题": {
@@ -226,10 +426,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    180,
-                    110,
-                    360,
-                    150
+                    700,
+                    40,
+                    520,
+                    180
                 ],
                 "expected": [
                     "黄金征服模式"
@@ -237,25 +437,46 @@
             }
         },
         "next": [
-            "征服-选择档位候选"
+            "征服-大厅回流判断"
         ]
     },
     "征服-无限标题": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "conquest/tier/infinite_title.png",
                 "roi": [
-                    170,
-                    110,
-                    380,
-                    150
+                    700,
+                    40,
+                    520,
+                    180
                 ],
-                "threshold": 0.8
+                "expected": [
+                    "无限征服模式"
+                ]
             }
         },
         "next": [
+            "征服-大厅回流判断"
+        ]
+    },
+    "征服-大厅回流判断": {
+        "next": [
+            "征服-大厅中对局已完成",
             "征服-选择档位候选"
+        ]
+    },
+    "征服-大厅中对局已完成": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "match_in_progress"
+                }
+            }
+        },
+        "next": [
+            "征服-记录整场完成"
         ]
     }
 }

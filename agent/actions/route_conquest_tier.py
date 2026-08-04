@@ -21,6 +21,18 @@ class RouteConquestTier(CustomAction):
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> bool:
         tier = STORE.next_tier_candidate()
-        # 候选耗尽说明没有可用门票；安全停止，绝不跳转到付费入口。
-        next_node = "公共-安全停止" if tier is None else TIER_NODE[tier]
+        state = STORE.require_state()
+        # 一轮候选全部确认失败通常表示征服大厅已经失步（例如卡片标题
+        # 被遮挡或页面没有完成切换）。重置队列后立即走已有恢复重启链，
+        # 避免把空队列写入断点后在下一次恢复中再次无限循环。
+        if tier is None:
+            STORE.reset_tier_candidates()
+            next_node = "征服-无可用档位等待"
+            state.mark_known("conquest_tiers_exhausted")
+            if state.config.auto_restart:
+                next_node = "公共-恢复重启"
+        else:
+            next_node = TIER_NODE[tier]
+            state.mark_known(f"conquest_tier:{tier.value}")
+        STORE.persist_checkpoint()
         return context.override_next(argv.node_name, [next_node])

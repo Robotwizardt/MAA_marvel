@@ -1,5 +1,15 @@
 {
     "天梯-任务入口": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelWarmupScreencap",
+                "custom_action_param": {
+                    "timeout_ms": 60000,
+                    "interval_ms": 1000
+                }
+            }
+        },
         "next": ["天梯-初始化会话"]
     },
     "天梯-初始化会话": {
@@ -37,11 +47,11 @@
         "recognition": {
             "type": "ColorMatch",
             "param": {
-                "roi": [420, 900, 90, 60],
+                "roi": [1030, 760, 150, 120],
                 "method": 4,
                 "lower": [30, 110, 35],
                 "upper": [90, 230, 100],
-                "count": 100
+                "count": 220
             }
         },
         "action": {"type": "Click"},
@@ -52,14 +62,26 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "roi": [210, 940, 300, 160],
+                "roi": [760, 800, 400, 200],
                 "expected": ["^开战$"]
             }
         },
         "action": {"type": "Click"},
         "post_delay": 1500,
-        "next": ["天梯-等待匹配状态"],
+        "next": ["天梯-比赛开始"],
         "on_error": ["公共-恢复决策"]
+    },
+    "天梯-比赛开始": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "match_started"
+                }
+            }
+        },
+        "next": ["天梯-等待匹配状态"]
     },
     "天梯-等待匹配状态": {
         "next": [
@@ -77,7 +99,7 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "roi": [0, 0, 720, 1280],
+                "roi": [0, 0, 1920, 1080],
                 "expected": ["^胜利$", "^失败$", "已逃离", "比赛结束"]
             }
         }
@@ -117,7 +139,11 @@
         "next": ["天梯-停止判断"]
     },
     "天梯-停止判断": {
-        "next": ["天梯-停止命中", "天梯-继续下一局"]
+        "next": [
+            "日常-对局后继续处理",
+            "天梯-停止命中",
+            "天梯-继续下一局"
+        ]
     },
     "天梯-停止命中": {
         "recognition": {
@@ -130,6 +156,16 @@
         "next": ["公共-安全停止"]
     },
     "天梯-继续下一局": {
-        "next": ["天梯-主页模式命中"]
+        "next": ["天梯-任务奖励到期", "天梯-主页模式命中"]
+    },
+    "天梯-任务奖励到期": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {"command": "task_rewards_due"}
+            }
+        },
+        "next": ["公共-领取任务奖励入口"]
     }
 }

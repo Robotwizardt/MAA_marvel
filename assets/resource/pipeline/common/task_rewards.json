@@ -1,0 +1,285 @@
+{
+    "公共-领取任务奖励入口": {
+        "next": [
+            "公共-领奖-首页稳定态",
+            "[JumpBack]公共-领奖-征服大厅返回",
+            "[JumpBack]公共-领奖-模式列表返回"
+        ],
+        "rate_limit": 500,
+        "timeout": 15000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-领奖-征服大厅返回": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    700,
+                    0,
+                    520,
+                    220
+                ],
+                "expected": [
+                    "^试炼之地$",
+                    "^白银征服模式$",
+                    "^黄金征服模式$",
+                    "^无限征服模式$"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 4
+            }
+        },
+        "post_delay": 1200
+    },
+    "公共-领奖-模式列表返回": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    800,
+                    0,
+                    320,
+                    100
+                ],
+                "expected": [
+                    "^模式$"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 4
+            }
+        },
+        "post_delay": 1200
+    },
+    "公共-领奖-首页稳定态": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-首页开战按钮",
+                    "公共-首页标签"
+                ],
+                "box_index": 0
+            }
+        },
+        "next": [
+            "公共-领奖-首页入口"
+        ],
+        "rate_limit": 500,
+        "timeout": 15000,
+        "on_error": [
+            "公共-领奖-首页入口重试"
+        ]
+    },
+    "公共-领奖-首页入口重试": {
+        "action": {
+            "type": "DoNothing"
+        },
+        "post_delay": 3000,
+        "next": [
+            "公共-领取任务奖励入口"
+        ]
+    },
+    "公共-领奖-首页入口": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-主界面",
+                    "公共-领奖-查看所有每日任务"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "公共-领奖-等待任务页"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-领奖-查看所有每日任务": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1500,
+                    320,
+                    420,
+                    740
+                ],
+                "expected": [
+                    "^查看所有每日任务$",
+                    "^查看所有任务$"
+                ]
+            }
+        }
+    },
+    "公共-领奖-等待任务页": {
+        "next": [
+            "公共-领奖-任务页证据",
+            "[JumpBack]公共-领奖-领取弹窗"
+        ],
+        "rate_limit": 500,
+        "timeout": 10000,
+        "on_error": [
+            "公共-领奖-返回主页"
+        ]
+    },
+    "公共-领奖-任务页证据": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    480,
+                    0,
+                    960,
+                    420
+                ],
+                "expected": [
+                    "^每周挑战$"
+                ]
+            }
+        },
+        "next": [
+            "公共-领奖-扫描奖励"
+        ]
+    },
+    "公共-领奖-扫描奖励": {
+        "next": [
+            "[JumpBack]公共-领奖-领取弹窗",
+            "[JumpBack]公共-领奖-点击已完成任务",
+            "公共-领奖-任务页无可领取"
+        ],
+        "rate_limit": 500,
+        "timeout": 30000,
+        "on_error": [
+            "公共-领奖-返回主页"
+        ]
+    },
+    "公共-领奖-领取弹窗": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    500,
+                    200,
+                    920,
+                    780
+                ],
+                "expected": [
+                    "^领取$"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200
+    },
+    "公共-领奖-点击已完成任务": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelDailyTaskReward",
+                "custom_recognition_param": {}
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200
+    },
+    "公共-领奖-任务页无可领取": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelDailyTaskClear",
+                "custom_recognition_param": {}
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 4
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "公共-领奖-返回主页"
+        ]
+    },
+    "公共-领奖-返回主页": {
+        "next": [
+            "公共-领奖-首页确认",
+            "[JumpBack]公共-领奖-任务页返回",
+            "[JumpBack]公共-领奖-领取弹窗"
+        ],
+        "rate_limit": 500,
+        "timeout": 12000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-领奖-任务页返回": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-领奖-任务页证据"
+                ],
+                "box_index": 0
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 4
+            }
+        },
+        "post_delay": 1200
+    },
+    "公共-领奖-首页确认": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-首页开战按钮",
+                    "公共-首页标签"
+                ],
+                "box_index": 0
+            }
+        },
+        "next": [
+            "公共-领奖-记录检查完成"
+        ]
+    },
+    "公共-领奖-记录检查完成": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "task_rewards_checked"
+                }
+            }
+        },
+        "next": [
+            "日常-任务奖励完成路由",
+            "公共-主界面"
+        ]
+    }
+}

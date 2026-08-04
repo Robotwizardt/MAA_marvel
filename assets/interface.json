@@ -3,14 +3,14 @@
     "name": "MAA_marvel",
     "description": "国服《漫威终极逆转》安卓自动化助手",
     "license": "MIT",
-    "welcome": "请选择 MuMu 12 或其他 720×1280 安卓模拟器后开始任务。",
+    "welcome": "请选择 1920×1080 横屏模式的 MuMu 12 或其他安卓模拟器后开始任务。",
     "github": "https://github.com/Robotwizardt/MAA_marvel",
     "version": "0.1.4",
     "controller": [
         {
             "name": "安卓端",
             "type": "Adb",
-            "display_short_side": 720
+            "display_short_side": 1080
         }
     ],
     "resource": [

@@ -7,10 +7,9 @@ from agent.strategies.ocr import CardCandidate, choose_card
 
 class StrategyTests(unittest.TestCase):
     def test_lane_targets_stay_in_player_area_not_location_cards(self) -> None:
-        self.assertEqual({point.x for point in LANE_TARGETS}, {145, 360, 575})
+        self.assertEqual({point.x for point in LANE_TARGETS}, {710, 960, 1210})
         for point in LANE_TARGETS:
-            self.assertTrue(800 <= point.y <= 900)
-            self.assertNotEqual(point.y, 650)
+            self.assertEqual(point.y, 730)
 
     def test_agatha_only_ends_turn(self) -> None:
         plan = build_agatha_plan()

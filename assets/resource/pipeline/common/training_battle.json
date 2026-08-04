@@ -4,10 +4,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    500,
-                    1120,
-                    220,
-                    120
+                    1580,
+                    900,
+                    340,
+                    180
                 ],
                 "expected": [
                     "结束回[合会]"
@@ -21,8 +21,6 @@
                 "custom_action_param": {
                     "play_strategy": "ocr",
                     "lane_order": "left_to_right",
-                    "max_matches": 0,
-                    "max_minutes": 0,
                     "auto_restart": false
                 }
             }
@@ -48,10 +46,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    500,
-                    1120,
-                    220,
-                    120
+                    1580,
+                    900,
+                    340,
+                    180
                 ],
                 "expected": [
                     "结束回[合会]"
