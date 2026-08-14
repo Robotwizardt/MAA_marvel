@@ -17,15 +17,27 @@
     "公共-识别当前页面": {
         "next": [
             "公共-启动加载中",
+            "公共-启动品牌加载中",
             "公共-启动活动弹窗",
+            "公共-累计签到领取",
             "公共-累计签到奖励",
+            "公共-活动中心关闭",
+            "日常-恢复任务页",
+            "日常-恢复邮箱页",
+            "日常-恢复通行证页",
+            "日常-首页开始",
+            "公共-模拟器桌面重启游戏",
             "公共-退出游戏取消",
+            "公共-恢复对局继续",
+            "公共-恢复可出牌回合",
+            "公共-恢复等待对手",
             "公共-战斗继续",
             "公共-首回合",
             "公共-等待对手",
             "征服-轮间结果",
             "征服-整场结果",
             "公共-重新连接",
+            "公共-恢复主界面",
             "公共-主界面",
             "公共-模式列表",
             "征服-进行中页面",
@@ -41,6 +53,113 @@
             "公共-恢复决策"
         ]
     },
+    "公共-恢复对局继续": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1200,
+                    800,
+                    720,
+                    280
+                ],
+                "expected": [
+                    "^继续$"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "match_resumed"
+                }
+            }
+        },
+        "next": [
+            "公共-战斗继续"
+        ]
+    },
+    "公共-恢复可出牌回合": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-结束回合文字",
+                    "公共-激活回合按钮颜色"
+                ],
+                "box_index": 0
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "match_resumed"
+                }
+            }
+        },
+        "next": [
+            "公共-撤退判断"
+        ]
+    },
+    "公共-恢复等待对手": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1500,
+                    780,
+                    420,
+                    300
+                ],
+                "expected": [
+                    "等待对手",
+                    "对手回合",
+                    "已结束回合",
+                    "等待中"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "match_resumed"
+                }
+            }
+        },
+        "next": [
+            "公共-等待对手"
+        ]
+    },
+    "公共-恢复主界面": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-首页开战按钮",
+                    "公共-首页标签"
+                ],
+                "box_index": 0
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "page_home"
+                }
+            }
+        },
+        "next": [
+            "公共-主界面"
+        ]
+    },
     "公共-启动加载中": {
         "recognition": {
             "type": "OCR",
@@ -48,11 +167,11 @@
                 "roi": [
                     0,
                     0,
-                    320,
-                    140
+                    600,
+                    200
                 ],
                 "expected": [
-                    "prod-[0-9.]+"
+                    "^prod[ -]?v?[0-9.]+[+]?[0-9]*[.]?$"
                 ]
             }
         },
@@ -62,69 +181,326 @@
             "公共-识别当前页面"
         ]
     },
-    "公共-启动活动弹窗": {
+    "公共-启动品牌加载中": {
         "recognition": {
             "type": "OCR",
             "param": {
                 "roi": [
-                    120,
-                    700,
-                    480,
-                    320
+                    650,
+                    400,
+                    620,
+                    360
                 ],
                 "expected": [
-                    "立即前往"
+                    "^MARVEL$",
+                    "^终极逆转$"
                 ]
+            }
+        },
+        "post_delay": 2000,
+        "max_hit": 60,
+        "next": [
+            "公共-识别当前页面"
+        ]
+    },
+    "公共-模拟器桌面重启游戏": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1040,
+                    130,
+                    340,
+                    190
+                ],
+                "expected": [
+                    "^漫威终极逆转$"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 8000,
+        "max_hit": 2,
+        "next": [
+            "公共-识别当前页面"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-启动活动弹窗": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-启动活动弹窗页面证据",
+                    "公共-启动活动弹窗关闭图标"
+                ],
+                "box_index": 0
             }
         },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    570,
-                    140,
-                    100,
-                    120
+                    1135,
+                    115,
+                    85,
+                    90
                 ]
             }
         },
         "post_delay": 1200,
+        "next": [
+            "公共-识别当前页面"
+        ]
+    },
+    "公共-启动活动弹窗页面证据": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "公共-启动活动弹窗文案",
+                    "公共-启动活动弹窗前往文案"
+                ]
+            }
+        }
+    },
+    "公共-启动活动弹窗文案": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    800,
+                    800,
+                    400,
+                    105
+                ],
+                "expected": [
+                    "^今日内不再弹出$"
+                ]
+            }
+        }
+    },
+    "公共-启动活动弹窗前往文案": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    820,
+                    680,
+                    300,
+                    120
+                ],
+                "expected": [
+                    "^立即前往.*$"
+                ]
+            }
+        }
+    },
+    "公共-启动活动弹窗关闭图标": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    1138,
+                    135,
+                    60,
+                    65
+                ],
+                "method": 40,
+                "lower": [
+                    [
+                        0,
+                        0,
+                        180
+                    ]
+                ],
+                "upper": [
+                    [
+                        180,
+                        80,
+                        255
+                    ]
+                ],
+                "count": 120,
+                "connected": true,
+                "order_by": "Area"
+            }
+        }
+    },
+    "公共-累计签到领取": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-累计签到领取按钮紫色背景",
+                    "公共-累计签到领取按钮"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
         "next": [
             "公共-识别当前页面"
         ]
     },
     "公共-累计签到奖励": {
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    160,
-                    140,
-                    400,
-                    180
+                "all_of": [
+                    "公共-累计签到奖励文案",
+                    "公共-累计签到关闭按钮"
                 ],
-                "expected": [
-                    "累签大奖"
-                ]
+                "box_index": 1
             }
         },
         "action": {
-            "type": "Click",
-            "param": {
-                "target": [
-                    300,
-                    1140,
-                    120,
-                    130
-                ]
-            }
+            "type": "Click"
         },
         "post_delay": 1200,
         "next": [
             "公共-识别当前页面"
         ]
     },
+    "公共-累计签到奖励文案": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    800,
+                    150,
+                    330,
+                    110
+                ],
+                "expected": [
+                    "^累签大奖$"
+                ]
+            }
+        }
+    },
+    "公共-累计签到领取按钮": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    840,
+                    900,
+                    260,
+                    140
+                ],
+                "expected": [
+                    "^领取$",
+                    "^领取奖励$"
+                ]
+            }
+        }
+    },
+    "公共-累计签到领取按钮紫色背景": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    835,
+                    910,
+                    252,
+                    122
+                ],
+                "method": 40,
+                "lower": [
+                    [
+                        120,
+                        100,
+                        50
+                    ]
+                ],
+                "upper": [
+                    [
+                        150,
+                        255,
+                        255
+                    ]
+                ],
+                "count": 3000,
+                "connected": true,
+                "order_by": "Area"
+            }
+        }
+    },
+    "公共-累计签到关闭按钮": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    120,
+                    950,
+                    160,
+                    100
+                ],
+                "expected": [
+                    "^关闭$"
+                ]
+            }
+        }
+    },
+    "公共-活动中心关闭": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-活动中心文案",
+                    "公共-累计签到关闭按钮"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "公共-识别当前页面"
+        ]
+    },
+    "公共-活动中心文案": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    800,
+                    0,
+                    320,
+                    100
+                ],
+                "expected": [
+                    "^活动中心$"
+                ]
+            }
+        }
+    },
     "公共-安全停止": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelTraceRuntime",
+                "custom_action_param": {
+                    "source": "pipeline",
+                    "reason": "pipeline_safe_stop",
+                    "stop": true
+                }
+            }
+        },
+        "next": [
+            "公共-执行停止"
+        ]
+    },
+    "公共-执行停止": {
         "action": {
             "type": "StopTask"
         }

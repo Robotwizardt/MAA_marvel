@@ -17,12 +17,11 @@ class SessionConfigTests(unittest.TestCase):
         self.assertEqual(config.reserve_silver_tickets, 1)
         self.assertEqual(config.reserve_gold_tickets, 1)
         self.assertEqual(config.reserve_infinite_tickets, 1)
-        self.assertTrue(config.stop_on_daily_pass_limit)
+        self.assertFalse(config.stop_on_daily_pass_limit)
         self.assertEqual(config.after_retreat, AfterRetreat.CONTINUE)
         self.assertEqual(config.snap_mode, SnapMode.ALWAYS)
         self.assertEqual(config.snap_probability, 46)
-        self.assertEqual(config.max_matches, 1)
-        self.assertEqual(config.max_minutes, 30)
+        self.assertEqual(config.claim_task_rewards_hours, 0)
         self.assertEqual(config.matchmaking_timeout_seconds, 600)
         self.assertTrue(config.auto_restart)
 
@@ -39,8 +38,7 @@ class SessionConfigTests(unittest.TestCase):
                 "after_retreat": "concede",
                 "snap_mode": "probability",
                 "snap_probability": 75,
-                "max_matches": 8,
-                "max_minutes": 90,
+                "claim_task_rewards_hours": 6,
                 "matchmaking_timeout_seconds": 300,
                 "auto_restart": False,
             }
@@ -54,8 +52,7 @@ class SessionConfigTests(unittest.TestCase):
         self.assertEqual(config.retreat_after_turn, 3)
         self.assertEqual(config.after_retreat, AfterRetreat.CONCEDE)
         self.assertEqual(config.snap_probability, 75)
-        self.assertEqual(config.max_matches, 8)
-        self.assertEqual(config.max_minutes, 90)
+        self.assertEqual(config.claim_task_rewards_hours, 6)
         self.assertEqual(config.matchmaking_timeout_seconds, 300)
         self.assertFalse(config.auto_restart)
 
@@ -65,8 +62,7 @@ class SessionConfigTests(unittest.TestCase):
             {"retreat_after_turn": 7},
             {"snap_probability": -1},
             {"snap_probability": 101},
-            {"max_matches": -1},
-            {"max_minutes": -1},
+            {"claim_task_rewards_hours": -1},
             {"matchmaking_timeout_seconds": 0},
             {"reserve_silver_tickets": -1},
             {"reserve_gold_tickets": -1},
@@ -80,3 +76,12 @@ class SessionConfigTests(unittest.TestCase):
     def test_rejects_unknown_enum_values(self) -> None:
         with self.assertRaises(ValueError):
             SessionConfig.from_mapping({"lane_order": "center_first"})
+
+    def test_rejects_non_boolean_daily_routine(self) -> None:
+        for value in (0, 1, "true", None):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(
+                    ValueError,
+                    "daily_routine must be a boolean",
+                ):
+                    SessionConfig.from_mapping({"daily_routine": value})

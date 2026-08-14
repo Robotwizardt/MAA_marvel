@@ -3,6 +3,10 @@ from pathlib import Path
 import shutil
 import sys
 
+PROJECT_ROOT = Path(__file__).parent.parent.resolve()
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 try:
     import jsonc
 except ModuleNotFoundError as e:
@@ -16,6 +20,8 @@ try:
     from tools.configure import configure_ocr_model
 except ModuleNotFoundError:
     from configure import configure_ocr_model
+
+from agent.runtime.task_cache import migrate_runtime_task_cache
 
 
 def get_dotnet_platform_tag(os_name: str, arch: str) -> str:
@@ -108,6 +114,7 @@ def install_project_files(
         shutil.copytree(
             agent_bundle,
             destination / "agent_runtime",
+            ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
             dirs_exist_ok=True,
         )
         executable = "MAA_marvel_agent.exe" if os_name == "win" else "MAA_marvel_agent"
@@ -126,6 +133,7 @@ def install_project_files(
     )
     shutil.copy2(source_root / "README.md", destination)
     shutil.copy2(source_root / "LICENSE", destination)
+    migrate_runtime_task_cache(destination)
 
 
 def main(argv: list[str] | None = None) -> int:

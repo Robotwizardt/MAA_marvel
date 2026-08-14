@@ -1,20 +1,82 @@
 {
     "公共-详情关闭按钮": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
-                    270,
-                    1120,
-                    180,
-                    150
+                    0,
+                    900,
+                    320,
+                    180
                 ],
-                "template": [
-                    "common/battle/detail_close.png"
-                ],
-                "threshold": [
-                    0.82
+                "expected": [
+                    "^关闭$"
                 ]
+            }
+        }
+    },
+    "公共-结束回合文字": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1580,
+                    900,
+                    340,
+                    180
+                ],
+                "expected": [
+                    "^结束回[合会]$"
+                ]
+            }
+        }
+    },
+    "公共-最终回合标记": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1640,
+                    960,
+                    260,
+                    100
+                ],
+                "expected": [
+                    "^最终回[合会][。.!！]?$"
+                ]
+            }
+        },
+        "next": [
+            "公共-最终回合SNAP命中",
+            "公共-SNAP跳过"
+        ]
+    },
+    "公共-激活回合按钮颜色": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    1670,
+                    960,
+                    180,
+                    70
+                ],
+                "method": 40,
+                "lower": [
+                    [
+                        120,
+                        80,
+                        100
+                    ]
+                ],
+                "upper": [
+                    [
+                        165,
+                        255,
+                        255
+                    ]
+                ],
+                "count": 3500
             }
         }
     },
@@ -36,7 +98,6 @@
         "next": [
             "征服-每日经验上限",
             "公共-战斗继续",
-            "征服-结果继续",
             "公共-首回合",
             "公共-匹配中",
             "征服-轮间结果",
@@ -54,10 +115,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    450,
-                    1040,
-                    270,
-                    240
+                    1200,
+                    800,
+                    720,
+                    280
                 ],
                 "expected": [
                     "^继续$"
@@ -80,10 +141,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    120,
-                    420,
-                    480,
-                    440
+                    500,
+                    250,
+                    920,
+                    500
                 ],
                 "expected": [
                     "正在匹配",
@@ -98,17 +159,13 @@
     },
     "公共-首回合": {
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    500,
-                    1120,
-                    220,
-                    120
+                "all_of": [
+                    "公共-结束回合文字",
+                    "公共-激活回合按钮颜色"
                 ],
-                "expected": [
-                    "结束回[合会]"
-                ]
+                "box_index": 0
             }
         },
         "action": {
@@ -165,8 +222,39 @@
             "公共-恢复决策"
         ]
     },
+    "公共-结束回合门禁": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "can_end_turn"
+                }
+            }
+        },
+        "rate_limit": 0,
+        "next": [
+            "公共-结束回合"
+        ]
+    },
+    "公共-继续出牌门禁": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "must_continue_playing"
+                }
+            }
+        },
+        "rate_limit": 0,
+        "next": [
+            "公共-执行出牌"
+        ]
+    },
     "公共-SNAP判断": {
         "next": [
+            "公共-最终回合标记",
             "公共-SNAP命中",
             "公共-SNAP跳过"
         ]
@@ -177,13 +265,40 @@
             "param": {
                 "custom_recognition": "MarvelSessionGate",
                 "custom_recognition_param": {
-                    "command": "should_snap"
+                    "command": "should_snap_first"
                 }
             }
         },
         "next": [
             "公共-点击SNAP",
-            "公共-结束回合"
+            "公共-结束回合门禁",
+            "公共-继续出牌门禁",
+            "公共-模拟器桌面重启游戏"
+        ],
+        "timeout": 3000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "公共-最终回合SNAP命中": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "should_snap_final"
+                }
+            }
+        },
+        "next": [
+            "公共-点击SNAP",
+            "公共-结束回合门禁",
+            "公共-继续出牌门禁",
+            "公共-模拟器桌面重启游戏"
+        ],
+        "timeout": 3000,
+        "on_error": [
+            "公共-恢复决策"
         ]
     },
     "公共-SNAP跳过": {
@@ -196,10 +311,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    280,
-                    40,
-                    160,
-                    170
+                    1340,
+                    580,
+                    240,
+                    240
                 ],
                 "expected": [
                     "^[1248]$"
@@ -217,15 +332,16 @@
     "公共-出牌后状态": {
         "next": [
             "征服-每日经验上限",
-            "公共-结束回合",
+            "公共-结束回合门禁",
+            "公共-继续出牌门禁",
             "公共-战斗继续",
-            "征服-结果继续",
             "公共-新回合",
             "征服-轮间结果",
             "征服-整场结果",
             "征服-返回征服大厅",
             "公共-重新连接",
-            "公共-等待对手"
+            "公共-等待对手",
+            "公共-模拟器桌面重启游戏"
         ],
         "rate_limit": 200,
         "timeout": 30000,
@@ -233,19 +349,31 @@
             "公共-恢复决策"
         ]
     },
-    "公共-结束回合": {
+    "公共-放置中状态": {
         "recognition": {
             "type": "OCR",
             "param": {
                 "roi": [
-                    500,
-                    1120,
-                    220,
-                    120
+                    1580,
+                    900,
+                    340,
+                    180
                 ],
                 "expected": [
-                    "结束回[合会]"
+                    "放置中"
                 ]
+            }
+        }
+    },
+    "公共-结束回合": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-结束回合文字",
+                    "公共-激活回合按钮颜色"
+                ],
+                "box_index": 0
             }
         },
         "action": {
@@ -263,13 +391,13 @@
         "next": [
             "征服-每日经验上限",
             "公共-战斗继续",
-            "征服-结果继续",
             "公共-新回合",
             "征服-轮间结果",
             "征服-整场结果",
             "征服-返回征服大厅",
             "公共-重新连接",
-            "公共-等待对手"
+            "公共-等待对手",
+            "公共-模拟器桌面重启游戏"
         ],
         "rate_limit": 300,
         "timeout": 180000,
@@ -282,10 +410,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
+                    1500,
+                    780,
                     420,
-                    840,
-                    300,
-                    360
+                    300
                 ],
                 "expected": [
                     "等待对手",
@@ -302,17 +430,13 @@
     },
     "公共-新回合": {
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    500,
-                    1120,
-                    220,
-                    120
+                "all_of": [
+                    "公共-结束回合文字",
+                    "公共-激活回合按钮颜色"
                 ],
-                "expected": [
-                    "结束回[合会]"
-                ]
+                "box_index": 0
             }
         },
         "action": {
@@ -333,10 +457,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    150,
-                    900,
-                    420,
-                    250
+                    500,
+                    700,
+                    920,
+                    330
                 ],
                 "expected": [
                     "^重新连接$",
@@ -357,10 +481,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    290,
-                    1120,
-                    140,
-                    160
+                    440,
+                    620,
+                    170,
+                    170
                 ],
                 "expected": [
                     "^[0O]$"

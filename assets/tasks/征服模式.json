@@ -10,7 +10,7 @@
             "controller": [
                 "安卓端"
             ],
-            "description": "仅支持国服安卓端 720×1280；不会购买门票或消耗金块。",
+            "description": "仅支持国服安卓端 1920×1080 横屏；不会购买门票或消耗金块。",
             "option": [
                 "征服-选择卡组",
                 "征服-放牌场地顺序",
@@ -18,32 +18,87 @@
                 "征服-保留门票数",
                 "征服-每日经验上限后结束",
                 "征服-自动撤退",
-                "征服-最大对局数",
-                "征服-最大运行分钟",
+                "征服-领取任务奖励小时",
                 "征服-匹配超时",
                 "征服-自动重启"
             ]
         }
     ],
     "option": {
+        "日常-完成后模式": {
+            "type": "select",
+            "label": "日常完成后进入",
+            "description": "全部日常步骤完成并返回主页后，进入所选模式持续自动对战。",
+            "default_case": "conquest",
+            "cases": [
+                {
+                    "name": "conquest",
+                    "label": "征服模式",
+                    "pipeline_override": {
+                        "Config_DailyBattleMode": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "game_mode": "conquest"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "ladder",
+                    "label": "天梯模式",
+                    "pipeline_override": {
+                        "Config_DailyBattleMode": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "game_mode": "ladder"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
         "征服-选择卡组": {
             "type": "input",
             "label": "选择卡组",
-            "description": "填写完整卡组名称后，在赛前页面选择同名卡组；留空或未找到时继续使用当前卡组。",
+            "description": "填写 0 表示不选择卡组；填写完整卡组名称后，在赛前页面选择同名卡组；留空或未找到时继续使用当前卡组。",
             "inputs": [
                 {
                     "name": "卡组名称",
                     "label": "卡组名称",
-                    "default": "",
+                    "default": "0",
                     "pipeline_type": "string"
                 }
             ],
             "pipeline_override": {
+                "Config_DeckName": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "deck_name": "{卡组名称}"
+                            }
+                        }
+                    }
+                },
                 "征服-选择指定卡组": {
                     "recognition": {
                         "param": {
                             "expected": [
-                                "^{卡组名称}$"
+                                "^(?!0$){卡组名称}$"
+                            ]
+                        }
+                    }
+                },
+                "征服-验证指定卡组": {
+                    "recognition": {
+                        "param": {
+                            "expected": [
+                                "^(?!0$){卡组名称}$"
                             ]
                         }
                     }
@@ -113,7 +168,7 @@
                     "name": "proving_grounds",
                     "label": "试炼之地",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_MaxTier": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -128,7 +183,7 @@
                     "name": "silver",
                     "label": "白银征服",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_MaxTier": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -143,7 +198,7 @@
                     "name": "gold",
                     "label": "黄金征服",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_MaxTier": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -158,7 +213,7 @@
                     "name": "infinite",
                     "label": "无限征服",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_MaxTier": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -202,7 +257,7 @@
                 }
             ],
             "pipeline_override": {
-                "征服-初始化会话": {
+                "Config_ReserveTickets": {
                     "action": {
                         "param": {
                             "custom_action_param": {
@@ -218,13 +273,13 @@
         "征服-每日经验上限后结束": {
             "type": "switch",
             "label": "达到每日通行证经验上限后结束",
-            "default_case": "Yes",
+            "default_case": "No",
             "cases": [
                 {
                     "name": "Yes",
                     "label": "结束任务",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_StopDailyPass": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -239,7 +294,7 @@
                     "name": "No",
                     "label": "继续对战",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_StopDailyPass": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -262,7 +317,7 @@
                     "name": "off",
                     "label": "关闭",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_Retreat": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -277,7 +332,7 @@
                     "name": "turn_4",
                     "label": "完成第 4 回合后",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_Retreat": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -292,7 +347,7 @@
                     "name": "turn_5",
                     "label": "完成第 5 回合后",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_Retreat": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -307,7 +362,7 @@
                     "name": "turn_6",
                     "label": "完成第 6 回合后",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_Retreat": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -320,50 +375,25 @@
                 }
             ]
         },
-        "征服-最大对局数": {
+        "征服-领取任务奖励小时": {
             "type": "input",
-            "label": "最大对局数",
-            "description": "0 表示不限制。",
+            "label": "领取任务奖励小时",
+            "description": "每隔指定小时，等待当前整场结束，再回到主页领取已完成的每日任务奖励；0 表示关闭。",
             "inputs": [
                 {
-                    "name": "最大对局数",
-                    "default": "1",
+                    "name": "领取任务奖励小时",
+                    "default": "0",
                     "pipeline_type": "int",
                     "verify": "^(0|[1-9][0-9]*)$",
                     "pattern_msg": "请输入非负整数"
                 }
             ],
             "pipeline_override": {
-                "征服-初始化会话": {
+                "Config_ClaimTaskRewardsHours": {
                     "action": {
                         "param": {
                             "custom_action_param": {
-                                "max_matches": "{最大对局数}"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "征服-最大运行分钟": {
-            "type": "input",
-            "label": "最大运行分钟数",
-            "description": "0 表示不限制。",
-            "inputs": [
-                {
-                    "name": "最大运行分钟",
-                    "default": "30",
-                    "pipeline_type": "int",
-                    "verify": "^(0|[1-9][0-9]*)$",
-                    "pattern_msg": "请输入非负整数"
-                }
-            ],
-            "pipeline_override": {
-                "征服-初始化会话": {
-                    "action": {
-                        "param": {
-                            "custom_action_param": {
-                                "max_minutes": "{最大运行分钟}"
+                                "claim_task_rewards_hours": "{领取任务奖励小时}"
                             }
                         }
                     }
@@ -383,7 +413,7 @@
                 }
             ],
             "pipeline_override": {
-                "征服-初始化会话": {
+                "Config_MatchmakingTimeout": {
                     "action": {
                         "param": {
                             "custom_action_param": {
@@ -403,7 +433,7 @@
                     "name": "Yes",
                     "label": "开启",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_AutoRestart": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {
@@ -418,7 +448,7 @@
                     "name": "No",
                     "label": "关闭",
                     "pipeline_override": {
-                        "征服-初始化会话": {
+                        "Config_AutoRestart": {
                             "action": {
                                 "param": {
                                     "custom_action_param": {

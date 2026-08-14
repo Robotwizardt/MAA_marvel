@@ -6,55 +6,51 @@ import unittest
 from PIL import Image
 
 from tools.crop_templates import crop_image
+from tools.validate_schema import load_jsonc
 
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "tests" / "fixtures" / "screens" / "manifest.json"
+PIPELINE_ROOT = ROOT / "assets" / "resource" / "pipeline"
 
 
-class TemplateManifestTests(unittest.TestCase):
+class LandscapeFixtureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.entries = json.loads(MANIFEST.read_text("utf-8"))["templates"]
+        cls.manifest = json.loads(MANIFEST.read_text("utf-8"))
 
-    def test_manifest_has_unique_outputs_and_existing_samples(self) -> None:
-        outputs = [entry["output"] for entry in self.entries]
-        self.assertEqual(len(outputs), len(set(outputs)))
-        for entry in self.entries:
-            with self.subTest(output=entry["output"]):
-                self.assertTrue((ROOT / entry["source"]).is_file())
-                self.assertTrue(entry["positive_nodes"])
-                self.assertTrue(entry["negative_sources"])
-                for negative in entry["negative_sources"]:
-                    self.assertTrue((ROOT / negative).is_file())
+    def test_all_reference_screens_are_native_landscape(self) -> None:
+        self.assertEqual(self.manifest["screen_size"], [1920, 1080])
+        self.assertTrue(self.manifest["screens"])
+        for relative_path in self.manifest["screens"]:
+            with self.subTest(source=relative_path):
+                source = ROOT / relative_path
+                self.assertTrue(source.is_file())
+                with Image.open(source) as image:
+                    self.assertEqual(image.size, (1920, 1080))
 
-    def test_sources_are_720_by_1280_and_boxes_are_inside(self) -> None:
-        for entry in self.entries:
-            source = ROOT / entry["source"]
-            with Image.open(source) as image:
-                self.assertEqual(image.size, (720, 1280))
-            x, y, width, height = entry["box"]
-            self.assertGreater(width, 0)
-            self.assertGreater(height, 0)
-            self.assertGreaterEqual(x, 0)
-            self.assertGreaterEqual(y, 0)
-            self.assertLessEqual(x + width, 720)
-            self.assertLessEqual(y + height, 1280)
-            self.assertNotEqual((width, height), (720, 1280))
+    def test_pipeline_no_longer_references_portrait_templates(self) -> None:
+        self.assertEqual(self.manifest["templates"], [])
+        for path in PIPELINE_ROOT.rglob("*.json"):
+            with self.subTest(path=path):
+                nodes = load_jsonc(path)
+                for node in nodes.values():
+                    recognition = node.get("recognition", {})
+                    if isinstance(recognition, dict):
+                        self.assertNotEqual(recognition.get("type"), "TemplateMatch")
 
-    def test_every_manifest_crop_has_the_declared_size(self) -> None:
+    def test_crop_accepts_landscape_source(self) -> None:
+        with TemporaryDirectory() as temporary_directory:
+            output = Path(temporary_directory) / "crop.png"
+            source = ROOT / self.manifest["screens"][0]
+            crop_image(source, output, [100, 100, 200, 150])
+            with Image.open(output) as cropped:
+                self.assertEqual(cropped.size, (200, 150))
+
+    def test_crop_rejects_portrait_source(self) -> None:
         with TemporaryDirectory() as temporary_directory:
             temporary = Path(temporary_directory)
-            for index, entry in enumerate(self.entries):
-                output = temporary / f"{index}.png"
-                crop_image(ROOT / entry["source"], output, entry["box"])
-                with Image.open(output) as cropped:
-                    self.assertEqual(cropped.size, tuple(entry["box"][2:]))
-
-    def test_crop_rejects_non_720p_source(self) -> None:
-        with TemporaryDirectory() as temporary_directory:
-            temporary = Path(temporary_directory)
-            source = temporary / "wrong.png"
+            source = temporary / "portrait.png"
             Image.new("RGB", (1080, 1920)).save(source)
             with self.assertRaises(ValueError):
                 crop_image(source, temporary / "output.png", [0, 0, 10, 10])

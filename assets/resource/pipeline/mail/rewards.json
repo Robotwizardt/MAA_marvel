@@ -1,0 +1,432 @@
+{
+    "邮箱-任务入口": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelWarmupScreencap",
+                "custom_action_param": {
+                    "timeout_ms": 60000,
+                    "interval_ms": 1000
+                }
+            }
+        },
+        "next": [
+            "邮箱-初始化会话"
+        ]
+    },
+    "邮箱-初始化会话": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "daily_routine": false
+                }
+            }
+        },
+        "next": [
+            "邮箱-流程入口"
+        ]
+    },
+    "邮箱-流程入口": {
+        "next": [
+            "邮箱-信息中心打开收件箱",
+            "邮箱-主界面打开邮箱"
+        ],
+        "rate_limit": 500,
+        "timeout": 8000,
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-主界面打开邮箱": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-主界面"
+                ],
+                "box_index": 0
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    180,
+                    20,
+                    16,
+                    16
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "邮箱-信息中心打开收件箱"
+        ],
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-首页邮件红点": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    205,
+                    20,
+                    50,
+                    50
+                ],
+                "method": 40,
+                "lower": [
+                    [
+                        0,
+                        150,
+                        130
+                    ],
+                    [
+                        170,
+                        150,
+                        130
+                    ]
+                ],
+                "upper": [
+                    [
+                        15,
+                        255,
+                        255
+                    ],
+                    [
+                        180,
+                        255,
+                        255
+                    ]
+                ],
+                "count": 45,
+                "connected": true,
+                "order_by": "Area"
+            }
+        }
+    },
+    "邮箱-信息中心打开收件箱": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "邮箱-信息中心标题",
+                    "邮箱-收件箱标签"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 800,
+        "next": [
+            "邮箱-收件箱状态"
+        ],
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-收件箱状态": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "邮箱-信息中心标题",
+                    "邮箱-收件箱标签"
+                ],
+                "box_index": 0
+            }
+        },
+        "next": [
+            "邮箱-打开红点邮件",
+            "邮箱-收件箱关闭"
+        ],
+        "rate_limit": 500,
+        "timeout": 12000,
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-信息中心标题": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    800,
+                    0,
+                    320,
+                    100
+                ],
+                "expected": [
+                    "^信息中心$"
+                ]
+            }
+        }
+    },
+    "邮箱-收件箱标签": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    610,
+                    55,
+                    240,
+                    80
+                ],
+                "expected": [
+                    "^收件箱$"
+                ]
+            }
+        }
+    },
+    "邮箱-收件箱页面": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "邮箱-信息中心标题",
+                    "邮箱-收件箱标签"
+                ],
+                "box_index": 0
+            }
+        }
+    },
+    "邮箱-收件箱奖励红点": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    1100,
+                    145,
+                    115,
+                    800
+                ],
+                "method": 40,
+                "lower": [
+                    [
+                        0,
+                        150,
+                        130
+                    ],
+                    [
+                        170,
+                        150,
+                        130
+                    ]
+                ],
+                "upper": [
+                    [
+                        15,
+                        255,
+                        255
+                    ],
+                    [
+                        180,
+                        255,
+                        255
+                    ]
+                ],
+                "count": 45,
+                "connected": true,
+                "order_by": "Area"
+            }
+        }
+    },
+    "邮箱-打开红点邮件": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "邮箱-收件箱页面",
+                    "邮箱-收件箱奖励红点"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "邮箱-邮件详情状态"
+        ],
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-邮件详情状态": {
+        "next": [
+            "邮箱-全部领取奖励",
+            "邮箱-已领取详情关闭"
+        ],
+        "rate_limit": 500,
+        "timeout": 10000,
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-全部领取奖励": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    740,
+                    760,
+                    440,
+                    160
+                ],
+                "expected": [
+                    "^全部领取$"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "邮箱-领取后状态"
+        ],
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-奖励展示领取": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    760,
+                    890,
+                    400,
+                    160
+                ],
+                "expected": [
+                    "^领取$"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "邮箱-领取后状态"
+        ],
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-已领取状态": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    740,
+                    760,
+                    440,
+                    160
+                ],
+                "expected": [
+                    "^已领取$"
+                ]
+            }
+        }
+    },
+    "邮箱-领取后状态": {
+        "next": [
+            "邮箱-奖励展示领取",
+            "邮箱-已领取详情关闭"
+        ],
+        "rate_limit": 500,
+        "timeout": 15000,
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-关闭文本": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    120,
+                    950,
+                    160,
+                    100
+                ],
+                "expected": [
+                    "^关闭$"
+                ]
+            }
+        }
+    },
+    "邮箱-已领取详情关闭": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "邮箱-已领取状态",
+                    "邮箱-关闭文本"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 700,
+        "next": [
+            "邮箱-收件箱状态"
+        ],
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-收件箱关闭": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "邮箱-收件箱页面",
+                    "邮箱-关闭文本"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "邮箱-首页确认"
+        ],
+        "on_error": [
+            "公共-安全停止"
+        ]
+    },
+    "邮箱-首页确认": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-首页开战按钮",
+                    "公共-首页标签"
+                ],
+                "box_index": 0
+            }
+        },
+        "next": [
+            "日常-邮箱完成路由",
+            "日常-普通子任务完成"
+        ],
+        "timeout": 10000,
+        "on_error": [
+            "公共-安全停止"
+        ]
+    }
+}

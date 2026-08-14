@@ -1,0 +1,453 @@
+{
+    "日常-任务入口": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelWarmupScreencap",
+                "custom_action_param": {
+                    "timeout_ms": 60000,
+                    "interval_ms": 1000
+                }
+            }
+        },
+        "next": [
+            "日常-初始化会话"
+        ]
+    },
+    "日常-初始化会话": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "daily_routine": true,
+                    "play_strategy": "ocr",
+                    "lane_order": "left_to_right",
+                    "max_tier": "proving_grounds",
+                    "reserve_silver_tickets": 1,
+                    "reserve_gold_tickets": 1,
+                    "reserve_infinite_tickets": 1,
+                    "stop_on_daily_pass_limit": false,
+                    "retreat_after_turn": 0,
+                    "after_retreat": "continue",
+                    "snap_mode": "always",
+                    "snap_probability": 46,
+                    "claim_task_rewards_hours": 0,
+                    "matchmaking_timeout_seconds": 600,
+                    "auto_restart": true,
+                    "deck_name": "0"
+                }
+            }
+        },
+        "next": [
+            "公共-启动游戏"
+        ]
+    },
+    "Config_DailyBattleMode": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelConfigureSession",
+                "custom_action_param": {
+                    "game_mode": "conquest"
+                }
+            }
+        }
+    },
+    "日常-待处理": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "daily_routine_pending"
+                }
+            }
+        }
+    },
+    "日常-首页开始": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "日常-待处理",
+                    "公共-主界面"
+                ],
+                "box_index": 1
+            }
+        },
+        "next": [
+            "公共-领取任务奖励入口"
+        ]
+    },
+    "日常-恢复任务页": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "日常-待处理",
+                    "公共-领奖-任务页证据"
+                ],
+                "box_index": 1
+            }
+        },
+        "next": [
+            "公共-领奖-扫描奖励"
+        ]
+    },
+    "日常-恢复邮箱页": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "日常-待处理",
+                    "邮箱-收件箱页面"
+                ],
+                "box_index": 1
+            }
+        },
+        "next": [
+            "邮箱-收件箱状态"
+        ]
+    },
+    "日常-恢复通行证页": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "日常-待处理",
+                    "通行证-页面证据"
+                ],
+                "box_index": 1
+            }
+        },
+        "next": [
+            "通行证-页面处理"
+        ]
+    },
+    "日常-任务奖励完成路由": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "daily_routine_pending"
+                }
+            }
+        },
+        "next": [
+            "邮箱-流程入口"
+        ]
+    },
+    "日常-邮箱完成路由": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "daily_routine_pending"
+                }
+            }
+        },
+        "next": [
+            "通行证-任务入口"
+        ]
+    },
+    "日常-普通子任务完成": {
+        "action": {
+            "type": "DoNothing"
+        }
+    },
+    "通行证-任务入口": {
+        "next": [
+            "通行证-首页打开入口",
+            "通行证-首页无入口",
+            "通行证-页面处理"
+        ],
+        "rate_limit": 500,
+        "timeout": 10000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "通行证-首页入口文字": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1680,
+                    220,
+                    240,
+                    220
+                ],
+                "expected": [
+                    "^赛季秘宝$",
+                    "^赛季通行证$"
+                ]
+            }
+        }
+    },
+    "通行证-首页打开入口": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-主界面",
+                    "通行证-首页入口文字"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "通行证-页面处理"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "通行证-首页无入口": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-首页开战按钮",
+                    "公共-首页标签"
+                ],
+                "box_index": 0
+            }
+        },
+        "next": [
+            "日常-记录完成"
+        ]
+    },
+    "通行证-页面证据": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    520,
+                    0,
+                    880,
+                    240
+                ],
+                "expected": [
+                    "^赛季秘宝$",
+                    "^赛季通行证$",
+                    "^通行证$"
+                ]
+            }
+        }
+    },
+    "通行证-页面处理": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "通行证-页面证据"
+                ],
+                "box_index": 0
+            }
+        },
+        "next": [
+            "[JumpBack]通行证-奖励展示领取",
+            "[JumpBack]通行证-领取奖励",
+            "通行证-返回主页"
+        ],
+        "rate_limit": 400,
+        "timeout": 30000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "通行证-奖励展示领取": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    650,
+                    820,
+                    620,
+                    240
+                ],
+                "expected": [
+                    "^领取$"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 900,
+        "max_hit": 20
+    },
+    "通行证-领取文字": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    300,
+                    150,
+                    1320,
+                    880
+                ],
+                "expected": [
+                    "^领取$"
+                ]
+            }
+        }
+    },
+    "通行证-领取奖励": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "通行证-页面证据",
+                    "通行证-领取文字"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 900,
+        "max_hit": 20
+    },
+    "通行证-返回主页": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "通行证-页面证据"
+                ],
+                "box_index": 0
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 4
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "通行证-首页确认"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "通行证-首页确认": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "公共-首页开战按钮",
+                    "公共-首页标签"
+                ],
+                "box_index": 0
+            }
+        },
+        "next": [
+            "日常-记录完成"
+        ],
+        "timeout": 12000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "日常-对局后继续处理": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "MarvelSessionGate",
+                "custom_recognition_param": {
+                    "command": "daily_routine_pending"
+                }
+            }
+        },
+        "next": [
+            "日常-返回主页状态"
+        ]
+    },
+    "日常-返回主页状态": {
+        "next": [
+            "日常-首页开始",
+            "日常-模式列表返回主页",
+            "日常-征服大厅返回主页"
+        ],
+        "rate_limit": 400,
+        "timeout": 12000,
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "日常-模式列表返回主页": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "日常-待处理",
+                    "公共-模式列表"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 4
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "日常-返回主页状态"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "日常-征服大厅返回主页": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "日常-待处理",
+                    "征服-大厅档位标题"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 4
+            }
+        },
+        "post_delay": 1500,
+        "next": [
+            "日常-返回主页状态"
+        ],
+        "on_error": [
+            "公共-恢复决策"
+        ]
+    },
+    "日常-记录完成": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MarvelRecordEvent",
+                "custom_action_param": {
+                    "event": "daily_routine_completed"
+                }
+            }
+        },
+        "next": [
+            "公共-主界面"
+        ]
+    }
+}

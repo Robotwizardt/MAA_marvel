@@ -12,7 +12,7 @@ from agent.runtime.store import STORE
 from agent.session.config import ConquestTier
 
 
-TICKET_COUNT_ROI = (170, 900, 380, 250)
+TICKET_COUNT_ROI = (800, 760, 360, 190)
 
 
 def parse_ticket_count(texts: Iterable[str]) -> int | None:
@@ -58,7 +58,13 @@ class SafeEntry(CustomRecognition):
         def matched(entry: str) -> bool:
             # 复用 Pipeline 中已有 OCR/模板节点，避免在 Python 重复维护 ROI。
             result = context.run_recognition(entry, argv.image)
-            return result is not None and result.box is not None
+            # run_recognition 未命中时仍会返回 RecognitionDetail；必须判断 hit，
+            # 否则空入口画面也可能被当成免费/票券/付费确认命中。
+            return bool(
+                result is not None
+                and getattr(result, "hit", False)
+                and getattr(result, "box", None) is not None
+            )
 
         ticket_count = None
         if tier is not ConquestTier.PROVING_GROUNDS:
@@ -84,7 +90,7 @@ class SafeEntry(CustomRecognition):
         safe = is_safe_entry(evidence)
         # box 不为空表示 CustomRecognition 命中；这里使用全屏框仅作为布尔信号。
         return CustomRecognition.AnalyzeResult(
-            box=(0, 0, 720, 1280) if safe else None,
+            box=(0, 0, 1920, 1080) if safe else None,
             detail={
                 "tier": tier.value,
                 "safe": safe,

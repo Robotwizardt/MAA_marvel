@@ -5,7 +5,33 @@ from maa.context import Context
 from maa.custom_action import CustomAction
 
 from agent.runtime.commands import parse_json_object
+from agent.runtime.diagnostics import DIAGNOSTICS
 from agent.runtime.store import STORE
+
+
+CONFIG_NODE_NAMES = (
+    "Config_DailyBattleMode",
+    "Config_PlayStrategy",
+    "Config_LaneOrder",
+    "Config_MaxTier",
+    "Config_ReserveTickets",
+    "Config_StopDailyPass",
+    "Config_Retreat",
+    "Config_ClaimTaskRewardsHours",
+    "Config_MatchmakingTimeout",
+    "Config_AutoRestart",
+    "Config_DeckName",
+)
+
+
+def _node_custom_values(context: Context, name: str) -> dict:
+    node = context.get_node_data(name) or {}
+    values = (
+        node.get("action", {})
+        .get("param", {})
+        .get("custom_action_param", {})
+    )
+    return dict(values) if isinstance(values, dict) else {}
 
 
 @AgentServer.custom_action("MarvelConfigureSession")
