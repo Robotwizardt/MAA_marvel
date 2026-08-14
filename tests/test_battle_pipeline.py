@@ -32,19 +32,6 @@ class BattlePipelineTests(unittest.TestCase):
         )
         self.assertEqual(recognition["param"]["roi"], [270, 1120, 180, 150])
 
-    def test_training_entries_are_single_turn_and_player_turn_guarded(self) -> None:
-        training = load_jsonc(
-            ROOT / "assets/resource/pipeline/common/training_battle.json"
-        )
-        for entry in ("训练-OCR选牌测试入口",):
-            node = training[entry]
-            self.assertEqual(node["recognition"]["type"], "OCR")
-            self.assertEqual(node["recognition"]["param"]["roi"], [500, 1120, 220, 120])
-            self.assertEqual(node["next"], ["训练-执行单回合出牌"])
-        self.assertEqual(
-            training["训练-执行单回合出牌"]["next"], ["训练-结束当前回合"]
-        )
-
     @classmethod
     def setUpClass(cls) -> None:
         cls.nodes = load_nodes()

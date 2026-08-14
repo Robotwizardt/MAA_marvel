@@ -7,7 +7,7 @@ from maa.custom_recognition import CustomRecognition
 
 from agent.runtime.commands import parse_json_object
 from agent.runtime.store import STORE
-from agent.session.config import AfterRetreat, ConquestTier, GameMode
+from agent.session.config import AfterRetreat, ConquestTier
 
 
 RNG = random.Random()
@@ -43,8 +43,6 @@ class SessionGate(CustomRecognition):
             )
         elif command == "stop_on_daily_pass_limit":
             matched = state.config.stop_on_daily_pass_limit
-        elif command == "mode_is_ladder":
-            matched = state.config.game_mode is GameMode.LADDER
         elif command.startswith("tier_available:"):
             requested = ConquestTier(command.split(":", 1)[1])
             matched = STORE.current_tier() is requested

@@ -109,7 +109,7 @@ class ConquestPipelineTests(unittest.TestCase):
     def test_conquest_disables_training_before_opening_mode_list(self) -> None:
         self.assertEqual(
             next_names(self.nodes["公共-主界面"]),
-            ["天梯-主页模式命中", "征服-关闭训练模式", "征服-打开模式列表"],
+            ["征服-关闭训练模式", "征服-打开模式列表"],
         )
         toggle = self.nodes["征服-关闭训练模式"]
         self.assertEqual(toggle["recognition"]["type"], "ColorMatch")
@@ -233,9 +233,7 @@ class ConquestPipelineTests(unittest.TestCase):
         self.assertEqual(
             set(values),
             {
-                "play_strategy",
                 "lane_order",
-                "game_mode",
                 "max_tier",
                 "reserve_silver_tickets",
                 "reserve_gold_tickets",

@@ -10,9 +10,7 @@
             "param": {
                 "custom_action": "MarvelConfigureSession",
                 "custom_action_param": {
-                    "play_strategy": "ocr",
                     "lane_order": "left_to_right",
-                    "game_mode": "conquest",
                     "max_tier": "proving_grounds",
                     "reserve_silver_tickets": 1,
                     "reserve_gold_tickets": 1,

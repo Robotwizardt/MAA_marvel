@@ -2,7 +2,7 @@ import unittest
 
 from agent.runtime.commands import apply_event, parse_json_object
 from agent.runtime.store import RuntimeStore
-from agent.session.config import ConquestTier, PlayStrategy
+from agent.session.config import ConquestTier
 from agent.session.state import StopReason
 
 
@@ -59,14 +59,13 @@ class RuntimeCommandTests(unittest.TestCase):
 
     def test_reconfigure_replaces_session_and_tier_route(self) -> None:
         store = RuntimeStore()
-        store.configure({"play_strategy": "agatha"}, now=10.0)
+        store.configure({}, now=10.0)
         first = store.require_state()
         first.completed_matches = 7
 
-        store.configure({"play_strategy": "ocr"}, now=20.0)
+        store.configure({}, now=20.0)
         second = store.require_state()
         self.assertIsNot(first, second)
-        self.assertEqual(second.config.play_strategy, PlayStrategy.OCR)
         self.assertEqual(second.completed_matches, 0)
         self.assertEqual(second.started_at, 20.0)
 

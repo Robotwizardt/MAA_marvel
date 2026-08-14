@@ -35,29 +35,18 @@ class InterfaceContractTests(unittest.TestCase):
 
     def test_only_conquest_task_file_is_imported(self) -> None:
         self.assertEqual(self.interface["import"], ["tasks/征服模式.json"])
-        self.assertEqual(len(self.task_file["task"]), 3)
+        self.assertEqual(len(self.task_file["task"]), 1)
         task = self.task_file["task"][0]
         self.assertEqual(task["name"], "征服模式自动对战")
         self.assertEqual(task["entry"], "征服-任务入口")
         self.assertTrue(task["default_check"])
         self.assertEqual(task["resource"], ["官服"])
         self.assertEqual(task["controller"], ["安卓端"])
-        ladder = self.task_file["task"][1]
-        self.assertEqual(ladder["name"], "天梯模式自动对战")
-        self.assertEqual(ladder["entry"], "天梯-任务入口")
-        self.assertFalse(ladder["default_check"])
-        training_tasks = self.task_file["task"][2:]
-        self.assertEqual(
-            [item["entry"] for item in training_tasks],
-            ["训练-OCR选牌测试入口"],
-        )
-        self.assertTrue(all(not item["default_check"] for item in training_tasks))
 
     def test_all_approved_options_are_exposed(self) -> None:
         options = self.task_file["option"]
         expected = {
             "征服-选择卡组",
-            "征服-出牌策略",
             "征服-放牌场地顺序",
             "征服-最高档位",
             "征服-保留门票数",
@@ -80,7 +69,6 @@ class InterfaceContractTests(unittest.TestCase):
             ]["expected"],
             ["^{卡组名称}$"],
         )
-        self.assertEqual(options["征服-出牌策略"]["default_case"], "ocr")
         self.assertEqual(
             options["征服-放牌场地顺序"]["default_case"], "left_to_right"
         )
@@ -102,11 +90,6 @@ class InterfaceContractTests(unittest.TestCase):
         self.assertEqual(options["征服-匹配超时"]["inputs"][0]["default"], "600")
         self.assertEqual(options["征服-自动重启"]["default_case"], "Yes")
 
-    def test_strategy_cases_are_agatha_and_ocr(self) -> None:
-        cases = self.task_file["option"]["征服-出牌策略"]["cases"]
-        self.assertEqual([case["name"] for case in cases], ["agatha", "ocr"])
-        self.assertIn("智能", cases[1]["label"])
-
     def test_retreat_only_exposes_late_turns_and_always_continues(self) -> None:
         cases = self.task_file["option"]["征服-自动撤退"]["cases"]
         self.assertEqual(
@@ -121,8 +104,6 @@ class InterfaceContractTests(unittest.TestCase):
             [case["name"] for case in option["cases"]],
             ["random", "left_to_right", "right_to_left"],
         )
-        training = self.task_file["task"][2]
-        self.assertIn("征服-放牌场地顺序", training["option"])
 
 
 if __name__ == "__main__":

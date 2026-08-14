@@ -448,6 +448,8 @@ build
 install
 dist/
 agent_dist/
+agent_build*/
+agent_dist*/
 MAA_marvel_agent.spec
 
 # Tools
@@ -455,6 +457,9 @@ tools/ImageCropper/**/*.png
 
 config
 debug
+temp/
+.pytest_cache/
+screenshot_*.png
 
 # Local Git worktrees
 .worktrees/

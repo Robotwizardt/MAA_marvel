@@ -11,7 +11,6 @@ from agent.actions.play_turn import (
     _click_end_turn,
     _is_detail_overlay,
     _scan_with_retry,
-    _wait_for_agatha,
     lane_targets_for_order,
 )
 from agent.recognitions.card_selection import (
@@ -272,7 +271,7 @@ class OcrAdapterTests(unittest.TestCase):
 
     def test_ocr_play_repeats_highest_affordable_until_none_remains(self) -> None:
         STORE.configure(
-            {"play_strategy": "ocr", "max_matches": 0, "max_minutes": 0}, now=0.0
+            {"max_matches": 0, "max_minutes": 0}, now=0.0
         )
         context = FakePlayContext()
         hand_3 = BattleHand(3, (card(0, 1, 180), card(1, 2, 420)), "recognized")
@@ -303,15 +302,6 @@ class OcrAdapterTests(unittest.TestCase):
             result = _scan_with_retry(context, context.controller)
         self.assertEqual(result.cards[0].cost, 1)
 
-    def test_agatha_waits_only_for_end_turn_without_scanning_cards(self) -> None:
-        context = FakePlayContext(
-            detail_match=SimpleNamespace(box=(550, 1149, 144, 55))
-        )
-        with patch("agent.actions.play_turn.scan_battle_hand") as scan:
-            self.assertTrue(_wait_for_agatha(context, context.controller))
-        scan.assert_not_called()
-        self.assertEqual(context.last_recognition_entry, "公共-结束回合")
-
     def test_already_snapped_turn_clicks_end_turn_directly(self) -> None:
         context = FakePlayContext(
             detail_match=SimpleNamespace(box=(550, 1149, 144, 55))
@@ -325,7 +315,6 @@ class OcrAdapterTests(unittest.TestCase):
     def test_failed_expensive_card_falls_back_to_cheaper_card(self) -> None:
         STORE.configure(
             {
-                "play_strategy": "ocr",
                 "snap_mode": "off",
                 "max_matches": 0,
                 "max_minutes": 0,
@@ -368,7 +357,7 @@ class OcrAdapterTests(unittest.TestCase):
 
     def test_full_field_tries_each_lane_once_then_stops(self) -> None:
         STORE.configure(
-            {"play_strategy": "ocr", "max_matches": 0, "max_minutes": 0}, now=0.0
+            {"max_matches": 0, "max_minutes": 0}, now=0.0
         )
         context = FakePlayContext()
         unchanged = BattleHand(2, (card(0, 2, 300),), "recognized")

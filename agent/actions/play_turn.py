@@ -14,7 +14,7 @@ from agent.recognitions.card_selection import (
     scan_battle_hand,
 )
 from agent.runtime.store import STORE
-from agent.session.config import LaneOrder, PlayStrategy, SnapMode
+from agent.session.config import LaneOrder, SnapMode
 from agent.strategies.ocr import CardCandidate, choose_card
 from agent.strategies.model import Point
 
@@ -37,10 +37,6 @@ SCAN_RETRIES = 2
 SCAN_RETRY_DELAY_SECONDS = 0.12
 DETAIL_CLOSE_POINT = Point(358, 1201)
 DETAIL_CLOSE_DELAY_SECONDS = 0.5
-# 阿加莎出牌动画期间按钮会显示“放置中”。只等待按钮恢复为“结束回合”，
-# 不执行任何手牌 OCR，避免与阿加莎争抢操作。
-AGATHA_WAIT_TIMEOUT_SECONDS = 8.0
-AGATHA_POLL_INTERVAL_SECONDS = 0.25
 DIRECT_END_TURN_DELAY_SECONDS = 0.2
 
 
@@ -145,19 +141,6 @@ def _scan_with_retry(context: Context, controller: object) -> BattleHand:
     return last
 
 
-def _wait_for_agatha(context: Context, controller: object) -> bool:
-    """等待阿加莎自动出牌结束；只识别结束回合按钮，不扫描任何卡牌。"""
-    deadline = time.monotonic() + AGATHA_WAIT_TIMEOUT_SECONDS
-    while time.monotonic() < deadline:
-        image = controller.post_screencap().get(wait=True)
-        matched = context.run_recognition("公共-结束回合", image)
-        if matched is not None and matched.box is not None:
-            return True
-        time.sleep(AGATHA_POLL_INTERVAL_SECONDS)
-    # 超时后仍交还 Pipeline，由“出牌后状态”统一处理重连、结算或恢复。
-    return False
-
-
 def _click_end_turn(
     context: Context,
     controller: object,
@@ -208,13 +191,6 @@ class PlayTurn(CustomAction):
         if state.should_stop(time.monotonic()):
             return True
         controller = context.tasker.controller
-        # 阿加莎会自己出牌，Agent 不应与她争抢操作权。这里只等待她完成，
-        # 随后的 SNAP 和结束回合点击仍由公共 Pipeline 节点执行。
-        if state.config.play_strategy is PlayStrategy.AGATHA:
-            _wait_for_agatha(context, controller)
-            if _can_end_turn_directly(state):
-                _click_end_turn(context, controller)
-            return True
 
         successful_plays = 0
         no_more_playable_cards = False

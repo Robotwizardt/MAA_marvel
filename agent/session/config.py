@@ -3,22 +3,11 @@ from enum import Enum
 from typing import Any, Mapping
 
 
-class PlayStrategy(str, Enum):
-    """界面 play_strategy 字符串允许的值。"""
-    AGATHA = "agatha"
-    OCR = "ocr"
-
-
 class LaneOrder(str, Enum):
     """把卡牌拖向三个场地时允许的尝试顺序。"""
     RANDOM = "random"
     LEFT_TO_RIGHT = "left_to_right"
     RIGHT_TO_LEFT = "right_to_left"
-
-
-class GameMode(str, Enum):
-    CONQUEST = "conquest"
-    LADDER = "ladder"
 
 
 class ConquestTier(str, Enum):
@@ -42,9 +31,7 @@ class SnapMode(str, Enum):
 @dataclass(frozen=True, slots=True)
 class SessionConfig:
     """一轮任务中不会变化的用户配置；默认值必须与 interface 选项一致。"""
-    play_strategy: PlayStrategy = PlayStrategy.OCR
     lane_order: LaneOrder = LaneOrder.LEFT_TO_RIGHT
-    game_mode: GameMode = GameMode.CONQUEST
     max_tier: ConquestTier = ConquestTier.PROVING_GROUNDS
     reserve_silver_tickets: int = 1
     reserve_gold_tickets: int = 1
@@ -72,9 +59,7 @@ class SessionConfig:
             raise ValueError("stop_on_daily_pass_limit must be a boolean")
 
         config = cls(
-            play_strategy=PlayStrategy(values.get("play_strategy", "ocr")),
             lane_order=LaneOrder(values.get("lane_order", "left_to_right")),
-            game_mode=GameMode(values.get("game_mode", "conquest")),
             max_tier=ConquestTier(values.get("max_tier", "proving_grounds")),
             reserve_silver_tickets=int(values.get("reserve_silver_tickets", 1)),
             reserve_gold_tickets=int(values.get("reserve_gold_tickets", 1)),

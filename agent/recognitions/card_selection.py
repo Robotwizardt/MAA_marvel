@@ -317,7 +317,7 @@ def scan_battle_hand(context: Context, image: Any) -> BattleHand:
     if not sparse_hand and any(card.cost <= energy.value for card in merged):
         return BattleHand(energy.value, merged, "window_path")
 
-    # 最后只探测已知数字左侧的费用角标。天梯卡组中细字体 1/2 经常漏检，
+    # 最后只探测已知数字左侧的费用角标。细字体 1/2 经常漏检，
     # 但同一张卡右侧较大的战力数字仍会被识别，因此无需再次扫描整条手牌。
     probe_results: list[tuple[Any, tuple[int, int, int, int]]] = []
     for roi in _build_cost_probe_rois((*located_results, *window_results)):
